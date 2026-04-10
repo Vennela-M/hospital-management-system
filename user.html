@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark bg-dark px-3">
+  <span class="navbar-brand">Hospital Dashboard</span>
+  <button class="btn btn-danger" onclick="logout()">Logout</button>
+</nav>
+
+<div class="container mt-5">
+
+  <h2>Welcome User 👋</h2>
+
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <div class="card p-3 shadow">
+        <h5>Appointments</h5>
+        <p>View your bookings</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card p-3 shadow">
+        <h5>Doctors</h5>
+        <p>Check available doctors</p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card p-3 shadow">
+        <h5>Profile</h5>
+        <p>View your details</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function logout(){
+  window.location = "index.html";
+}
+</script>
+
+</body>
+</html>
