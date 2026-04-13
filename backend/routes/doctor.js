@@ -1,8 +1,30 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const Appointment = require("../models/Appointment");
 
-// ✅ ADD THIS (main fix)
+
+//  ADD DOCTOR (profile creation)
+router.post("/", async (req, res) => {
+  try {
+    const { name, email, specialization } = req.body;
+
+    const doctor = await User.create({
+      name,
+      email,
+      specialization,
+      role: "doctor"
+    });
+
+    res.json(doctor);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+//  GET ALL DOCTORS
 router.get("/", async (req, res) => {
   try {
     const doctors = await User.find({ role: "doctor" });
@@ -12,35 +34,63 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Existing routes
+
+//  GET SINGLE DOCTOR PROFILE
+router.get("/:id", async (req, res) => {
+  try {
+    const doctor = await User.findById(req.params.id);
+    res.json(doctor);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+//  GET DOCTOR PATIENTS (CORRECT WAY)
 router.get("/patients/:doctorId", async (req, res) => {
   try {
-    const patients = await User.find({
-      role: "user",
-      appointments: req.params.doctorId
-    });
+    const appointments = await Appointment.find({
+      doctor: req.params.doctorId
+    }).populate("patient");
+
+    const patients = appointments.map(a => a.patient);
+
     res.json(patients);
+
   } catch (err) {
-    res.json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
-router.post("/set-availability", async (req, res) => {
+
+//  AUTO AVAILABILITY (BASED ON APPOINTMENTS)
+router.get("/availability/:doctorId", async (req, res) => {
   try {
-    const { doctorId, availability } = req.body;
+    const doctorId = req.params.doctorId;
 
-    const doctor = await User.findById(doctorId);
+    const appointments = await Appointment.find({ doctor: doctorId });
 
-    if (!doctor) return res.json({ message: "Doctor not found" });
+    const allSlots = [
+      "10:00 AM",
+      "11:00 AM",
+      "12:00 PM",
+      "2:00 PM",
+      "3:00 PM"
+    ];
 
-    doctor.availability = availability;
+    const bookedSlots = appointments.map(a => a.time);
 
-    await doctor.save();
+    const freeSlots = allSlots.filter(s => !bookedSlots.includes(s));
 
-    res.json({ message: "Availability updated" });
+    res.json({
+      bookedSlots,
+      freeSlots
+    });
+
   } catch (err) {
-    res.json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
+
 
 module.exports = router;

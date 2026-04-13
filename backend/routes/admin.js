@@ -1,46 +1,44 @@
 const express = require("express");
 const router = express.Router();
+
 const User = require("../models/User");
+const Patient = require("../models/Patient");
+const Appointment = require("../models/Appointment");
+const Bed = require("../models/Bed");
 
-
-// Get all system data
-router.get("/all-data", async (req, res) => {
-
+// ✅ STATS ROUTE (THIS IS WHAT YOU ARE MISSING)
+router.get("/stats", async (req, res) => {
   try {
-
-    const users = await User.find();
-
-    const doctors = await User.find({ role: "doctor" });
-
-    const patients = await User.find({ role: "user" });
-
-    const hospitals = await User.find({ role: "hospital" });
+    const patients = await Patient.countDocuments();
+    const doctors = await User.countDocuments({ role: "doctor" });
+    const appointments = await Appointment.countDocuments();
+    const beds = await Bed.countDocuments();
 
     res.json({
-      totalUsers: users.length,
-      totalDoctors: doctors.length,
-      totalPatients: patients.length,
-      totalHospitals: hospitals.length,
-      users
+      patients,
+      doctors,
+      appointments,
+      beds
     });
 
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Error fetching data",
-      error
-    });
-
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
 });
-// Delete a user/doctor by id
-router.delete("/user/:id", async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ message: "User deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Error deleting user", error });
-  }
-}); 
+
+// APPOINTMENTS
+router.get("/appointments", async (req, res) => {
+  const data = await Appointment.find()
+    .populate("patient")
+    .populate("doctor");
+
+  res.json(data);
+});
+
+// BEDS
+router.get("/beds", async (req, res) => {
+  const beds = await Bed.find().populate("patient");
+  res.json(beds);
+});
+
 module.exports = router;
