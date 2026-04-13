@@ -15,6 +15,19 @@ app.use(bodyParser.json());
 
 // Routes
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/hospital", require("./routes/hospital"));
+app.use("/api/admin", require("./routes/admin"));
+
+const userRoute = require("./routes/user");
+const doctorRoute = require("./routes/doctor");
+
+app.use("/api/users", userRoute);
+app.use("/api/doctors", doctorRoute);
+
+const appointmentRoutes = require("./routes/appointment");
+app.use("/api/appointments", appointmentRoutes);
+
+app.use("/uploads", express.static("uploads"));
 
 // Test route
 app.get("/", (req, res) => {
@@ -25,6 +38,3 @@ app.get("/", (req, res) => {
 app.listen(5000, () => {
   console.log("🚀 Server running on http://localhost:5000");
 });
-const appointmentRoutes = require("./routes/appointment");
-app.use("/api/appointments", appointmentRoutes);
-app.use("/uploads", express.static("uploads"));
