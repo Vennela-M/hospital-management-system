@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Bed = require("../models/Bed");
 const mongoose = require("mongoose");
+const { auth, requireRole } = require("../middleware/auth");
 
 // ✅ CREATE BED (THIS IS MISSING IN YOUR CASE)
-router.post("/", async (req, res) => {
+router.post("/", auth, requireRole(["admin"]), async (req, res) => {
   try {
     const { bedNumber, type } = req.body;
     if (!bedNumber || !type) {
@@ -18,7 +19,7 @@ router.post("/", async (req, res) => {
 });
 
 // GET ALL BEDS
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
     const beds = await Bed.find().populate("patient");
     res.json(beds);
@@ -28,7 +29,7 @@ router.get("/", async (req, res) => {
 });
 
 // ASSIGN BED
-router.put("/assign", async (req, res) => {
+router.put("/assign", auth, requireRole(["admin", "doctor"]), async (req, res) => {
   try {
     const { bedId, patientId } = req.body;
     if (!mongoose.Types.ObjectId.isValid(bedId) || !mongoose.Types.ObjectId.isValid(patientId)) {
@@ -55,5 +56,7 @@ router.put("/assign", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+module.exports = router;
 
 module.exports = router;

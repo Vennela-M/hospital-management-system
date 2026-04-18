@@ -13,32 +13,52 @@ const doctorsList = [
 async function signup() {
 try {
 const name = document.getElementById("name").value;
-const contact = document.getElementById("contact").value;
+const email = document.getElementById("email").value;
+const phone = document.getElementById("phone").value;
 const password = document.getElementById("password").value;
 
-    let email = "";
-    let phone = "";
+// Get selected role
+const roleRadio = document.querySelector('input[name="role"]:checked');
+const role = roleRadio ? roleRadio.value : 'user';
 
-    if (contact.includes("@")) email = contact;
-    else phone = contact;
+// Prepare signup data
+let signupData = {
+    name,
+    email,
+    phone,
+    password,
+    role
+};
 
-    const res = await fetch("http://localhost:5000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, phone, password })
-    });
+// Add doctor-specific fields if role is doctor
+if (role === 'doctor') {
+    const specialization = document.getElementById("specialization").value;
+    const hospital = document.getElementById("hospital").value;
 
-    const data = await res.json();
+    signupData.specialization = specialization;
+    signupData.hospital = hospital;
+}
 
-    if (res.ok) {
-        alert(data.message || "Signup successful");
-        window.location = "login.html"; // redirect after signup
-    } else {
-        alert(data.message || "Signup failed");
-    }
+console.log('Signup data:', signupData); // For debugging
+
+const res = await fetch("http://localhost:5000/api/auth/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(signupData)
+});
+
+const data = await res.json();
+console.log('Response:', res.status, data); // For debugging
+
+if (res.ok) {
+    alert(data.message || "Signup successful");
+    window.location = "login.html"; // redirect after signup
+} else {
+    alert(data.message || "Signup failed");
+}
 
 } catch (err) {
-    console.error(err);
+    console.error('Signup error:', err);
     alert("Server error during signup");
 }
 
@@ -64,13 +84,13 @@ async function login() {
     
         const data = await res.json();
     
-        if (res.ok && data.role) {
-            localStorage.setItem("user", JSON.stringify(data));
+        if (res.ok && data.user && data.user.role) {
+            localStorage.setItem("user", JSON.stringify(data.user));
     
-            if (data.role === "user") window.location = "user.html";
-            else if (data.role === "doctor") window.location = "doctor.html";
-            else if (data.role === "hospital") window.location = "hospital.html";
-            else if (data.role === "admin") window.location = "admin.html";
+            if (data.user.role === "user") window.location = "user.html";
+            else if (data.user.role === "doctor") window.location = "doctor.html";
+            else if (data.user.role === "hospital") window.location = "hospital.html";
+            else if (data.user.role === "admin") window.location = "admin.html";
         } else {
             alert(data.message || "Login failed");
         }
@@ -118,8 +138,22 @@ function loadUserDashboard() {
     currentSection = "appointments";
     container.innerHTML = "";
     
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+        alert("Please login first");
+        window.location = "index.html";
+        return;
+    }
+    
     try {
-        const res = await fetch("http://localhost:5000/api/appointments");
+        const headers = {};
+        if (user && user.token) {
+            headers["Authorization"] = `Bearer ${user.token}`;
+        }
+        
+        const res = await fetch(`http://localhost:5000/api/appointments/patient/${user._id}`, {
+            headers: headers
+        });
         const data = await res.json();
     
         let output = `
@@ -135,21 +169,25 @@ function loadUserDashboard() {
             <div id="appointmentsList"></div>
         `;
     
-        data.forEach(app => {
-            if (!app.hospital || !app.doctor) return;
-        
-            output += `
-            <div class="card p-2 mb-2">
-                <p><b>Hospital:</b> ${app.hospital}</p>
-                <p><b>Doctor:</b> ${app.doctor}</p>
-                <p><b>Date:</b> ${app.date}</p>
+        if (res.ok && data.appointments) {
+            data.appointments.forEach(app => {
+                if (!app.hospital || !app.doctor) return;
             
-                <button class="btn btn-danger btn-sm" onclick="deleteAppointment('${app._id}')">
-                    Delete
-                </button>
-            </div>
-            `;
-        });
+                output += `
+                <div class="card p-2 mb-2">
+                    <p><b>Hospital:</b> ${app.hospital}</p>
+                    <p><b>Doctor:</b> ${app.doctor}</p>
+                    <p><b>Date:</b> ${app.date}</p>
+                
+                    <button class="btn btn-danger btn-sm" onclick="deleteAppointment('${app._id}')">
+                        Delete
+                    </button>
+                </div>
+                `;
+            });
+        } else {
+            output += "<p>No appointments found or error loading appointments</p>";
+        }
     
         container.innerHTML = output;
     
@@ -163,7 +201,7 @@ function loadUserDashboard() {
     async function bookAppointment() {
         const user = JSON.parse(localStorage.getItem("user"));
         const hospital = document.getElementById("hospital").value;
-        const doctor = document.getElementById("doctor").value;
+        const doctorName = document.getElementById("doctor").value;
         const date = document.getElementById("date").value;
         
         try {
@@ -172,29 +210,56 @@ function loadUserDashboard() {
                 window.location = "index.html";
                 return;
             }
+            
+            if (!doctorName || !hospital || !date) {
+                alert("Please fill in all appointment details");
+                return;
+            }
+            
+            // Find doctor by name from the all doctors list
+            let doctorId = null;
+            if (window.allDoctors) {
+                const doctor = window.allDoctors.find(d => d.name === doctorName);
+                if (doctor) {
+                    doctorId = doctor._id;
+                }
+            }
+            
+            if (!doctorId) {
+                alert("Invalid doctor selection");
+                return;
+            }
         
-            const res = await fetch("http://localhost:5000/api/appointments/book", {
+            const res = await fetch("http://localhost:5000/api/appointments", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${user.token || ""}`
+                },
                 body: JSON.stringify({
-                    name: user.name,
-                    hospital,
-                    doctor,
-                    date
+                    patient: user._id,
+                    doctor: doctorId,
+                    date: date,
+                    time: "10:00", // Default time - can be made selectable
+                    notes: ""
                 })
             });
         
             const data = await res.json();
 
-if (res.ok) {
-    alert(data.message || "Appointment booked successfully");
-} else {
-    alert(data.error || "Booking failed");
-}
+            if (res.ok) {
+                alert("Appointment booked successfully");
+                document.getElementById("hospital").value = "";
+                document.getElementById("doctor").value = "";
+                document.getElementById("date").value = "";
+                showAppointments(); // Refresh the list
+            } else {
+                alert(data.message || "Booking failed");
+            }
         
         } catch (err) {
             console.error(err);
-            alert("Server error");
+            alert("Server error: " + err.message);
         }
         
         }
@@ -214,24 +279,70 @@ function showDoctors() {
         <h3>Select Specialization</h3>
     
         <select id="specialization" class="form-control mb-3" onchange="filterDoctors()">
-            <option value="">Select</option>
+            <option value="">All Specializations</option>
             <option value="Cardiology">Cardiology</option>
             <option value="Dermatology">Dermatology</option>
             <option value="Neurology">Neurology</option>
         </select>
     
-        <div id="doctorList"></div>
+        <div id="doctorList">Loading doctors...</div>
     `;
     
     container.innerHTML = output;
     
+    // Fetch doctors from API
+    fetchDoctors();
+    
+    }
+    
+    //FETCH DOCTORS
+    async function fetchDoctors() {
+        try {
+            const user = JSON.parse(localStorage.getItem("user"));
+            const headers = {};
+            
+            if (user && user.token) {
+                headers["Authorization"] = `Bearer ${user.token}`;
+            }
+            
+            const res = await fetch("http://localhost:5000/api/doctors", {
+                headers: headers
+            });
+            let data = await res.json();
+            
+            if (res.ok) {
+                // Handle both array and wrapped object responses
+                let doctors = Array.isArray(data) ? data : (data.doctors || data.value || []);
+                
+                if (doctors.length > 0) {
+                    window.allDoctors = doctors;
+                    filterDoctors(); // Show all initially
+                } else {
+                    document.getElementById("doctorList").innerHTML = "<p>No doctors found</p>";
+                }
+            } else {
+                document.getElementById("doctorList").innerHTML = "<p>No doctors found</p>";
+            }
+        } catch (err) {
+            console.error(err);
+            document.getElementById("doctorList").innerHTML = "<p>Error loading doctors</p>";
+        }
     }
     //FILTER DOCTORS
     function filterDoctors() {
         const selected = document.getElementById("specialization").value;
         const listDiv = document.getElementById("doctorList");
         
-        const filtered = doctorsList.filter(d => d.specialization === selected);
+        if (!window.allDoctors) {
+            listDiv.innerHTML = "<p>Loading doctors...</p>";
+            return;
+        }
+        
+        let filtered = window.allDoctors;
+        
+        if (selected) {
+            filtered = window.allDoctors.filter(d => d.specialization === selected);
+        }
         
         if (filtered.length === 0) {
             listDiv.innerHTML = "<p>No doctors found</p>";
@@ -285,53 +396,70 @@ async function showProfile() {
     currentSection = "profile";
     
     const user = JSON.parse(localStorage.getItem("user"));
-    const identifier = user.email || user.phone;
+    if (!user) {
+        alert("Please login first");
+        window.location = "index.html";
+        return;
+    }
     
     try {
-        const res = await fetch(`http://localhost:5000/api/auth/getProfile/${identifier}`);
+        const headers = {};
+        if (user && user.token) {
+            headers["Authorization"] = `Bearer ${user.token}`;
+        }
+        
+        const res = await fetch("http://localhost:5000/api/auth/me", {
+            headers: headers
+        });
         const data = await res.json();
     
-        let output = `
-        <h3>Profile</h3>
+        if (res.ok && data.user) {
+            const profile = data.user;
+            
+            let output = `
+            <h3>Profile</h3>
     
-        <h5 class="mt-3">Basic Info</h5>
-        <input id="p_name" class="form-control mb-2" value="${data.name || ""}" placeholder="Name">
-        <input id="p_email" class="form-control mb-2" value="${data.email || ""}" placeholder="Email">
-        <input id="p_phone" class="form-control mb-2" value="${data.phone || ""}" placeholder="Phone">
+            <h5 class="mt-3">Basic Info</h5>
+            <input id="p_name" class="form-control mb-2" value="${profile.name || ""}" placeholder="Name">
+            <input id="p_email" class="form-control mb-2" value="${profile.email || ""}" placeholder="Email">
+            <input id="p_phone" class="form-control mb-2" value="${profile.phone || ""}" placeholder="Phone">
     
-        <h5 class="mt-3">Personal / Medical Info</h5>
-        <input id="p_age" class="form-control mb-2" placeholder="Age" value="${data.age || ""}">
-        <input id="p_gender" class="form-control mb-2" placeholder="Gender" value="${data.gender || ""}">
-        <input id="p_height" class="form-control mb-2" placeholder="Height" value="${data.height || ""}">
-        <input id="p_weight" class="form-control mb-2" placeholder="Weight" value="${data.weight || ""}">
-        <input id="p_blood" class="form-control mb-2" placeholder="Blood Group" value="${data.bloodGroup || ""}">
+            <h5 class="mt-3">Personal / Medical Info</h5>
+            <input id="p_age" class="form-control mb-2" placeholder="Age" value="${profile.age || ""}">
+            <input id="p_gender" class="form-control mb-2" placeholder="Gender" value="${profile.gender || ""}">
+            <input id="p_height" class="form-control mb-2" placeholder="Height" value="${profile.height || ""}">
+            <input id="p_weight" class="form-control mb-2" placeholder="Weight" value="${profile.weight || ""}">
+            <input id="p_blood" class="form-control mb-2" placeholder="Blood Group" value="${profile.bloodGroup || ""}">
     
-        <input id="p_disease" class="form-control mb-2" placeholder="Chronic Diseases" value="${data.diseases || ""}">
-        <input id="p_surgeries" class="form-control mb-2" placeholder="Past Surgeries" value="${data.surgeries || ""}">
-        <input id="p_allergies" class="form-control mb-2" placeholder="Allergies" value="${data.allergies || ""}">
-        <input id="p_medications" class="form-control mb-2" placeholder="Current Medications" value="${data.medications || ""}">
+            <input id="p_disease" class="form-control mb-2" placeholder="Chronic Diseases" value="${profile.diseases || ""}">
+            <input id="p_surgeries" class="form-control mb-2" placeholder="Past Surgeries" value="${profile.surgeries || ""}">
+            <input id="p_allergies" class="form-control mb-2" placeholder="Allergies" value="${profile.allergies || ""}">
+            <input id="p_medications" class="form-control mb-2" placeholder="Current Medications" value="${profile.medications || ""}">
     
-        <h5 class="mt-3">Emergency</h5>
-        <input id="p_emergency_name" class="form-control mb-2" placeholder="Emergency Contact Name" value="${data.emergencyContactName || ""}">
-        <input id="p_emergency_number" class="form-control mb-2" placeholder="Emergency Contact Number" value="${data.emergencyContactNumber || ""}">
+            <h5 class="mt-3">Emergency</h5>
+            <input id="p_emergency_name" class="form-control mb-2" placeholder="Emergency Contact Name" value="${profile.emergencyContactName || ""}">
+            <input id="p_emergency_number" class="form-control mb-2" placeholder="Emergency Contact Number" value="${profile.emergencyContactNumber || ""}">
     
-        <h5 class="mt-3">Reports</h5>
-        <input type="file" id="reportFile" class="form-control mb-2">
-        <button class="btn btn-primary mb-2" onclick="uploadReport()">Upload Report</button>
+            <h5 class="mt-3">Reports</h5>
+            <input type="file" id="reportFile" class="form-control mb-2">
+            <button class="btn btn-primary mb-2" onclick="uploadReport()">Upload Report</button>
     
-        ${data.reports && data.reports.length > 0
-            ? data.reports.map(r => `
-                <div>
-                    <a href="http://localhost:5000/uploads/${r}" target="_blank">📄 View Report</a>
-                </div>
-            `).join("")
-            : "<p>No reports uploaded</p>"
+            ${profile.reports && profile.reports.length > 0
+                ? profile.reports.map(r => `
+                    <div>
+                        <a href="http://localhost:5000/uploads/${r}" target="_blank">📄 View Report</a>
+                    </div>
+                `).join("")
+                : "<p>No reports uploaded</p>"
+            }
+    
+            <button class="btn btn-success mt-3" onclick="saveProfile()">Save</button>
+            `;
+    
+            container.innerHTML = output;
+        } else {
+            container.innerHTML = "<p>Error loading profile</p>";
         }
-    
-        <button class="btn btn-success mt-3" onclick="saveProfile()">Save</button>
-        `;
-    
-        container.innerHTML = output;
     
     } catch (err) {
         console.error(err);

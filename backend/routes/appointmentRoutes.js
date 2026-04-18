@@ -2,10 +2,11 @@ const express = require("express");
 const router = express.Router();
 const Appointment = require("../models/Appointment");
 const mongoose = require("mongoose");
+const { auth, requireRole } = require("../middleware/auth");
 
 
 // ✅ CREATE APPOINTMENT
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
   try {
     const { patient, doctor, date, time, notes, followUpDays } = req.body;
 
@@ -54,7 +55,7 @@ router.post("/", async (req, res) => {
 
 
 // ✅ GET ALL APPOINTMENTS (with full details)
-router.get("/", async (req, res) => {
+router.get("/", auth, requireRole(["admin", "doctor"]), async (req, res) => {
   try {
     const data = await Appointment.find()
       .populate("patient", "name age email")
@@ -70,9 +71,14 @@ router.get("/", async (req, res) => {
 
 
 // ✅ GET APPOINTMENTS BY DOCTOR (VERY IMPORTANT 🔥)
-router.get("/doctor/:doctorId", async (req, res) => {
+router.get("/doctor/:doctorId", auth, async (req, res) => {
   try {
     const { doctorId } = req.params;
+
+    // Allow doctor to see their own, or admin to see any
+    if (req.user.role !== "admin" && req.user._id.toString() !== doctorId) {
+      return res.status(403).json({ message: "Access denied" });
+    }
 
     const data = await Appointment.find({ doctor: doctorId })
       .populate("patient", "name age email");
@@ -87,9 +93,14 @@ router.get("/doctor/:doctorId", async (req, res) => {
 
 
 // ✅ GET APPOINTMENTS BY USER (PATIENT)
-router.get("/patient/:patientId", async (req, res) => {
+router.get("/patient/:patientId", auth, async (req, res) => {
   try {
     const { patientId } = req.params;
+
+    // Allow patient to see their own, or admin/doctor
+    if (req.user.role === "user" && req.user._id.toString() !== patientId) {
+      return res.status(403).json({ message: "Access denied" });
+    }
 
     const data = await Appointment.find({ patient: patientId })
       .populate("doctor", "name specialization");
@@ -104,7 +115,7 @@ router.get("/patient/:patientId", async (req, res) => {
 
 
 // ✅ UPDATE STATUS (IMPORTANT FEATURE 🔥)
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, requireRole(["admin", "doctor"]), async (req, res) => {
   try {
     const { status } = req.body;
 
@@ -144,7 +155,7 @@ router.get("/reminders", async (req, res) => {
 
 
 // ✅ DELETE
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, requireRole(["admin"]), async (req, res) => {
   try {
     const deleted = await Appointment.findByIdAndDelete(req.params.id);
 
@@ -164,7 +175,7 @@ router.delete("/:id", async (req, res) => {
 module.exports = router;
 
 // ✅ ADD PRESCRIPTION
-router.put("/prescription/:id", async (req, res) => {
+router.put("/prescription/:id", auth, requireRole(["admin", "doctor"]), async (req, res) => {
   try {
     const { prescription } = req.body;
 
@@ -185,7 +196,7 @@ router.put("/prescription/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-router.post("/book", async (req, res) => {
+router.post("/book", auth, async (req, res) => {
   try {
     const { name, hospital, doctor, date } = req.body;
 
@@ -205,16 +216,5 @@ router.post("/book", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-router.delete("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
 
-    await Appointment.findByIdAndDelete(id);
-
-    res.json({ message: "Appointment deleted successfully" });
-
-  } catch (err) {
-    console.error("DELETE ERROR:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+module.exports = router;

@@ -1,66 +1,268 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <style>
-.card:hover {
-    transform: scale(1.03);
-    transition: 0.3s;
-}
-</style>
-  <title>User Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - MediCare</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
 </head>
 
 <body>
-<h3 id="welcome"></h3>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-hospital text-primary me-2"></i>
+                <span class="fw-bold">MediCare</span>
+            </a>
 
-<nav class="navbar navbar-dark bg-dark px-3">
-  <span class="navbar-brand">Hospital Dashboard</span>
-  <button class="btn btn-danger" onclick="logout()">Logout</button>
-</nav>
-<div class="container mt-5">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-  <h2 id="welcomeText"></h2>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-user-circle me-1"></i>
+                            Welcome, <span id="userName" class="fw-bold"></span>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-  <div class="row mt-4">
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">Patient Dashboard</h1>
+                    <p class="text-muted mb-0">Manage your healthcare journey</p>
+                </div>
+                <div class="text-end">
+                    <div class="h6 mb-0" id="currentDate"></div>
+                    <small class="text-muted">Last login: <span id="lastLogin"></span></small>
+                </div>
+            </div>
+        </div>
 
-    <div class="col-md-4">
-      <div class="card p-3 shadow text-center" onclick="showAppointments()" style="cursor:pointer;">
-        <h5>Appointments</h5>
-        <p>View & Book</p>
-      </div>
+        <!-- Quick Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-primary" id="totalAppointments">0</div>
+                        <small class="text-muted">Total Appointments</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-success" id="upcomingAppointments">0</div>
+                        <small class="text-muted">Upcoming</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-info" id="completedAppointments">0</div>
+                        <small class="text-muted">Completed</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-warning" id="reportsCount">0</div>
+                        <small class="text-muted">Medical Reports</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card" onclick="showAppointments()">
+                <div class="dashboard-card-icon text-primary">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Appointments</h3>
+                <p>Book, view, and manage your appointments</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Click to manage
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showDoctors()">
+                <div class="dashboard-card-icon text-success">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h3>Find Doctors</h3>
+                <p>Search and connect with healthcare professionals</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Find specialists
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showProfile()">
+                <div class="dashboard-card-icon text-info">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <h3>My Profile</h3>
+                <p>Update personal and medical information</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Manage details
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showMedicalRecords()">
+                <div class="dashboard-card-icon text-warning">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <h3>Medical Records</h3>
+                <p>Access your complete health history</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>View records
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div id="mainContent" class="content-section" style="display: none;">
+            <!-- Content will be loaded here -->
+        </div>
     </div>
 
-    <div class="col-md-4">
-      <div class="card p-3 shadow text-center" onclick="showDoctors()" style="cursor:pointer;">
-        <h5>Doctors</h5>
-        <p>Find Specialists</p>
-      </div>
-    </div>
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3 mt-5">
+        <div class="container text-center">
+            <small>&copy; 2024 MediCare. All rights reserved.</small>
+        </div>
+    </footer>
 
-    <div class="col-md-4">
-      <div class="card p-3 shadow text-center" onclick="showProfile()" style="cursor:pointer;">
-        <h5>Profile</h5>
-        <p>Manage Details</p>
-      </div>
-    </div>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
 
-  </div>
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadUserDashboard();
+            updateDashboardStats();
+            setCurrentDate();
+        });
 
-  <!-- 🔥 Dynamic Section -->
-  <div id="mainContent" class="mt-4"></div>
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                window.location = 'index.html';
+            }
+        }
 
-</div>
+        function updateDashboardStats() {
+            // This would normally fetch from API
+            // For now, just set placeholders
+            document.getElementById('totalAppointments').textContent = '3';
+            document.getElementById('upcomingAppointments').textContent = '1';
+            document.getElementById('completedAppointments').textContent = '2';
+            document.getElementById('reportsCount').textContent = '5';
+        }
 
-<script>
-function logout(){
-  window.location = "index.html";
-}
-</script>
-<script src="js/main.js"></script>
-<script>
-    checkAuth();
-    loadUserDashboard();
-</script>
+        function setCurrentDate() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent =
+                now.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            document.getElementById('lastLogin').textContent =
+                now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showMedicalRecords() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'medical-records') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'medical-records';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-file-medical me-2"></i>Medical Records</h2>
+                    <button class="btn btn-primary" onclick="showProfile()">
+                        <i class="fas fa-plus me-1"></i>Upload Report
+                    </button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Recent Reports</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fas fa-file-medical fa-3x mb-3"></i>
+                                    <p>No medical reports uploaded yet.</p>
+                                    <button class="btn btn-primary" onclick="showProfile()">
+                                        Upload Your First Report
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Quick Stats</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Total Reports:</span>
+                                    <strong>0</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>This Month:</span>
+                                    <strong>0</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Last Upload:</span>
+                                    <strong>N/A</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
 </body>
 </html>

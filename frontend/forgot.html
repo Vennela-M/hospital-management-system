@@ -1,25 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Forgot Password</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password - MediCare</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
 </head>
 
-<body class="bg-light d-flex justify-content-center align-items-center vh-100">
+<body class="auth-body">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light position-absolute top-0 start-0 w-100">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <i class="fas fa-hospital text-primary me-2"></i>
+                <span class="fw-bold">MediCare</span>
+            </a>
+        </div>
+    </nav>
 
-<div class="card p-4 shadow" style="width:350px">
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-6 col-lg-5">
+                <div class="auth-card">
+                    <div class="auth-header text-center">
+                        <div class="auth-icon mb-3">
+                            <i class="fas fa-key fa-3x text-primary"></i>
+                        </div>
+                        <h2 class="h4 mb-2">Forgot Your Password?</h2>
+                        <p class="text-muted mb-4">
+                            No worries! Enter your email address and we'll send you a reset link.
+                        </p>
+                    </div>
 
-    <h3 class="text-center mb-3">Reset Password</h3>
+                    <form id="forgotPasswordForm" onsubmit="handleForgotPassword(event)">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="email"
+                                    placeholder="Enter your email address"
+                                    required
+                                >
+                            </div>
+                            <div class="form-text">
+                                We'll send a password reset link to this email.
+                            </div>
+                        </div>
 
-    <input id="contact" class="form-control mb-2" placeholder="Email or Mobile">
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            <i class="fas fa-paper-plane me-2"></i>Send Reset Link
+                        </button>
 
-    <input id="newPassword" type="password" class="form-control mb-2" placeholder="New Password">
+                        <div class="text-center">
+                            <a href="login.html" class="text-decoration-none">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Login
+                            </a>
+                        </div>
+                    </form>
 
-    <button class="btn btn-warning w-100" onclick="resetPassword()">Reset</button>
+                    <!-- Success Message (hidden by default) -->
+                    <div id="successMessage" class="alert alert-success mt-3" style="display: none;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Password reset link has been sent to your email address.
+                        Please check your inbox and follow the instructions.
+                    </div>
 
-</div>
+                    <!-- Error Message (hidden by default) -->
+                    <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <span id="errorText"></span>
+                    </div>
+                </div>
 
-<script src="./main.js"></script>
+                <!-- Additional Help -->
+                <div class="text-center mt-4">
+                    <p class="text-muted mb-2">Need help?</p>
+                    <a href="#contact" class="text-decoration-none">
+                        <i class="fas fa-phone me-1"></i>Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <!-- Footer -->
+    <footer class="auth-footer">
+        <div class="container text-center">
+            <small class="text-muted">
+                &copy; 2024 MediCare. All rights reserved.
+            </small>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        function handleForgotPassword(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+
+            // Hide previous messages
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+
+            // Simulate API call (replace with actual API call)
+            setTimeout(() => {
+                // For demo purposes, always show success
+                // In real implementation, check if email exists
+                document.getElementById('successMessage').style.display = 'block';
+
+                // Reset form
+                document.getElementById('forgotPasswordForm').reset();
+
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        // Add input validation
+        document.getElementById('email').addEventListener('input', function() {
+            const email = this.value;
+            const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+            if (email && !isValid) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    </script>
 </body>
 </html>

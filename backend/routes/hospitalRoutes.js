@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const Hospital = require("../models/Hospital");
+const { auth, requireRole } = require("../middleware/auth");
 
 
 // ✅ CREATE HOSPITAL
-router.post("/", async (req, res) => {
+router.post("/", auth, requireRole(["admin"]), async (req, res) => {
     try {
       const hospital = await Hospital.create(req.body);
       res.json(hospital);
@@ -14,7 +15,7 @@ router.post("/", async (req, res) => {
   });
 
 // ✅ GET HOSPITALS
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
     try {
       const data = await Hospital.find();
       res.json(data);
@@ -25,7 +26,7 @@ router.get("/", async (req, res) => {
 
 
 // ✅ UPDATE BEDS
-router.put("/:id", async (req, res) => {
+router.put("/:id", auth, requireRole(["admin"]), async (req, res) => {
   const updated = await Hospital.findByIdAndUpdate(
     req.params.id,
     req.body,

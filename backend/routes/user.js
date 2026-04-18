@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const upload = require("../middleware/upload");
+const { auth } = require("../middleware/auth");
 
 // GET PROFILE
-router.get("/profile/:id", async (req, res) => {
+router.get("/profile/:id", auth, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     res.json(user);
@@ -14,7 +15,7 @@ router.get("/profile/:id", async (req, res) => {
 });
 
 // (optional) UPDATE PROFILE
-router.put("/profile/:id", async (req, res) => {
+router.put("/profile/:id", auth, async (req, res) => {
   try {
     const updated = await User.findByIdAndUpdate(
       req.params.id,
@@ -27,9 +28,7 @@ router.put("/profile/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
-
-router.post("/upload-report/:id", upload.single("report"), async (req, res) => {
+router.post("/upload-report/:id", auth, upload.single("report"), async (req, res) => {
   try {
 
     // ✅ ADD THIS HERE (FIRST THING)
@@ -53,3 +52,5 @@ router.post("/upload-report/:id", upload.single("report"), async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+module.exports = router;

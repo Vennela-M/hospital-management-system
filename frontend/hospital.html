@@ -1,1 +1,379 @@
-<h2>🏥 Hospital Dashboard</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Information - MediCare</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <i class="fas fa-hospital text-primary me-2"></i>
+                <span class="fw-bold">MediCare</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#departments">Departments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold text-white mb-4">
+                        Welcome to <span class="text-primary">MediCare</span>
+                    </h1>
+                    <p class="lead text-white-50 mb-4">
+                        Your trusted healthcare partner providing comprehensive medical services
+                        with state-of-the-art facilities and compassionate care.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="signup.html" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Register Now
+                        </a>
+                        <a href="#contact" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-phone me-2"></i>Contact Us
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image">
+                        <i class="fas fa-hospital fa-5x text-white-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2 class="section-title">About Our Hospital</h2>
+                    <p class="lead text-muted mb-4">
+                        MediCare General Hospital has been serving the community for over 25 years,
+                        providing exceptional healthcare services with a commitment to excellence,
+                        innovation, and patient-centered care.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-4">
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <div class="feature-icon text-primary mb-3">
+                            <i class="fas fa-user-md fa-3x"></i>
+                        </div>
+                        <h4>Expert Doctors</h4>
+                        <p>Our team of highly qualified physicians and specialists are dedicated to providing the best possible care.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <div class="feature-icon text-success mb-3">
+                            <i class="fas fa-microscope fa-3x"></i>
+                        </div>
+                        <h4>Advanced Technology</h4>
+                        <p>State-of-the-art medical equipment and technology for accurate diagnosis and treatment.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="feature-card text-center">
+                        <div class="feature-icon text-info mb-3">
+                            <i class="fas fa-heart fa-3x"></i>
+                        </div>
+                        <h4>Patient Care</h4>
+                        <p>Compassionate care with a focus on patient comfort, safety, and well-being.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Departments Section -->
+    <section id="departments" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="section-title">Our Departments</h2>
+                    <p class="lead text-muted">Comprehensive healthcare services across all medical specialties</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="department-card">
+                        <div class="department-icon text-primary">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h4>Cardiology</h4>
+                        <p>Comprehensive heart care including diagnosis, treatment, and prevention of cardiovascular diseases.</p>
+                        <div class="department-stats">
+                            <small class="text-muted">
+                                <i class="fas fa-user-md me-1"></i>12 Specialists
+                                <i class="fas fa-bed ms-3 me-1"></i>45 Beds
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="department-card">
+                        <div class="department-icon text-success">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h4>Neurology</h4>
+                        <p>Advanced neurological care for brain and nervous system disorders with cutting-edge treatments.</p>
+                        <div class="department-stats">
+                            <small class="text-muted">
+                                <i class="fas fa-user-md me-1"></i>8 Specialists
+                                <i class="fas fa-bed ms-3 me-1"></i>30 Beds
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="department-card">
+                        <div class="department-icon text-info">
+                            <i class="fas fa-bone"></i>
+                        </div>
+                        <h4>Orthopedics</h4>
+                        <p>Expert care for musculoskeletal conditions including bones, joints, ligaments, and tendons.</p>
+                        <div class="department-stats">
+                            <small class="text-muted">
+                                <i class="fas fa-user-md me-1"></i>6 Specialists
+                                <i class="fas fa-bed ms-3 me-1"></i>25 Beds
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="department-card">
+                        <div class="department-icon text-warning">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <h4>Emergency Medicine</h4>
+                        <p>24/7 emergency care with rapid response teams and advanced life support capabilities.</p>
+                        <div class="department-stats">
+                            <small class="text-muted">
+                                <i class="fas fa-user-md me-1"></i>15 Specialists
+                                <i class="fas fa-bed ms-3 me-1"></i>20 Beds
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="department-card">
+                        <div class="department-icon text-danger">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <h4>Laboratory</h4>
+                        <p>State-of-the-art diagnostic laboratory services with quick and accurate test results.</p>
+                        <div class="department-stats">
+                            <small class="text-muted">
+                                <i class="fas fa-microscope me-1"></i>Advanced Equipment
+                                <i class="fas fa-clock ms-3 me-1"></i>24/7 Service
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="department-card">
+                        <div class="department-icon text-secondary">
+                            <i class="fas fa-x-ray"></i>
+                        </div>
+                        <h4>Radiology</h4>
+                        <p>Advanced imaging services including MRI, CT scans, X-rays, and ultrasound diagnostics.</p>
+                        <div class="department-stats">
+                            <small class="text-muted">
+                                <i class="fas fa-camera me-1"></i>Latest Technology
+                                <i class="fas fa-user-md ms-3 me-1"></i>5 Radiologists
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="section-title">By the Numbers</h2>
+                    <p class="lead text-muted">Our commitment to excellence in healthcare</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="stat-card text-center">
+                        <div class="stat-number text-primary">25+</div>
+                        <div class="stat-label">Years of Service</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card text-center">
+                        <div class="stat-number text-success">50,000+</div>
+                        <div class="stat-label">Patients Served</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card text-center">
+                        <div class="stat-number text-info">200+</div>
+                        <div class="stat-label">Medical Staff</div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="stat-card text-center">
+                        <div class="stat-number text-warning">98%</div>
+                        <div class="stat-label">Patient Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="section-title">Contact Us</h2>
+                    <p class="lead text-muted">Get in touch with our healthcare professionals</p>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="contact-card">
+                        <h4><i class="fas fa-map-marker-alt text-primary me-2"></i>Address</h4>
+                        <p>123 Healthcare Avenue<br>
+                        Medical District<br>
+                        City, State 12345</p>
+                    </div>
+
+                    <div class="contact-card">
+                        <h4><i class="fas fa-phone text-success me-2"></i>Phone</h4>
+                        <p>Emergency: (555) 911-0000<br>
+                        Main: (555) 123-4567<br>
+                        Appointments: (555) 123-4568</p>
+                    </div>
+
+                    <div class="contact-card">
+                        <h4><i class="fas fa-envelope text-info me-2"></i>Email</h4>
+                        <p>info@medicare.com<br>
+                        appointments@medicare.com<br>
+                        emergency@medicare.com</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">Send us a Message</h4>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Message</label>
+                                    <textarea class="form-control" rows="4" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>MediCare Hospital</h5>
+                    <p>Your trusted healthcare partner for over 25 years.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#about" class="text-white-50">About Us</a></li>
+                        <li><a href="#departments" class="text-white-50">Departments</a></li>
+                        <li><a href="#contact" class="text-white-50">Contact</a></li>
+                        <li><a href="login.html" class="text-white-50">Patient Portal</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Emergency</h5>
+                    <p class="mb-1"><strong>24/7 Emergency:</strong></p>
+                    <p class="mb-0">(555) 911-0000</p>
+                    <p class="small text-white-50 mt-2">For medical emergencies, call immediately.</p>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="text-center">
+                <small>&copy; 2024 MediCare. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

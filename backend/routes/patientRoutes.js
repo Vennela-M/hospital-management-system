@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const Patient = require("../models/Patient");
+const User = require("../models/User");
+const { auth, requireRole } = require("../middleware/auth");
 
 // ================= GET ALL =================
-router.get("/", async (req, res) => {
+router.get("/", auth, requireRole(["admin", "doctor"]), async (req, res) => {
   try {
-    const patients = await Patient.find().sort({ createdAt: -1 });
+    const patients = await User.find({ role: "user" }).sort({ createdAt: -1 });
     res.json(patients);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -14,17 +15,28 @@ router.get("/", async (req, res) => {
 });
 
 // ================= ADD =================
-router.post("/", async (req, res) => {
+router.post("/", auth, requireRole(["admin"]), async (req, res) => {
   try {
-    const { name, age, gender } = req.body;
+    const { name, age, gender, phone, address, disease, admitted, symptoms, area } = req.body;
 
     // Prevent duplicate
-    const exists = await Patient.findOne({ name, age, gender });
+    const exists = await User.findOne({ name, age, gender });
     if (exists) {
       return res.status(400).json({ message: "Patient already exists" });
     }
 
-    const patient = await Patient.create({ name, age, gender });
+    const patient = await User.create({ 
+      name, 
+      age, 
+      gender, 
+      phone, 
+      address, 
+      diseases: disease, 
+      admitted, 
+      symptoms, 
+      area,
+      role: "user"
+    });
     res.json(patient);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -32,7 +44,7 @@ router.post("/", async (req, res) => {
 });
 
 // ================= DELETE =================
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, requireRole(["admin"]), async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -40,7 +52,7 @@ router.delete("/:id", async (req, res) => {
       return res.status(400).json({ message: "Invalid ID" });
     }
 
-    const deleted = await Patient.findByIdAndDelete(id);
+    const deleted = await User.findOneAndDelete({ _id: id, role: "user" });
 
     if (!deleted) {
       return res.status(404).json({ message: "Patient not found" });

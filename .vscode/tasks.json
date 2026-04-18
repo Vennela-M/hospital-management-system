@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Backend Server",
+			"type": "shell",
+			"command": "cd S:\\Hospital\\hospital-management-system\\backend && node server.js",
+			"isBackground": true
+		},
+		{
+			"label": "Start Backend Server",
+			"type": "shell",
+			"command": "cd S:\\Hospital\\hospital-management-system\\backend; node server.js",
+			"isBackground": true
+		}
+	]
+}

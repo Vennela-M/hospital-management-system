@@ -1,1 +1,678 @@
-<h2>⚙️ Admin Dashboard</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MediCare</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-hospital text-primary me-2"></i>
+                <span class="fw-bold">MediCare</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-cog me-1"></i>
+                            Admin: <span id="adminName" class="fw-bold"></span>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">Admin Dashboard</h1>
+                    <p class="text-muted mb-0">System administration and management</p>
+                </div>
+                <div class="text-end">
+                    <div class="h6 mb-0" id="currentDate"></div>
+                    <small class="text-muted">System Status: <span class="badge bg-success">Online</span></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-primary" id="totalUsers">0</div>
+                        <small class="text-muted">Total Users</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-success" id="activeDoctors">0</div>
+                        <small class="text-muted">Active Doctors</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-info" id="totalAppointments">0</div>
+                        <small class="text-muted">Total Appointments</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-warning" id="systemRevenue">0</div>
+                        <small class="text-muted">Monthly Revenue</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card" onclick="showUserManagement()">
+                <div class="dashboard-card-icon text-primary">
+                    <i class="fas fa-users-cog"></i>
+                </div>
+                <h3>User Management</h3>
+                <p>Manage users, doctors, and administrators</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Manage users
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showHospitalManagement()">
+                <div class="dashboard-card-icon text-success">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3>Hospital Management</h3>
+                <p>Configure hospital settings and departments</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Manage hospital
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showAppointmentManagement()">
+                <div class="dashboard-card-icon text-info">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>Appointment Management</h3>
+                <p>Oversee all appointments and scheduling</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Manage appointments
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showSystemReports()">
+                <div class="dashboard-card-icon text-warning">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3>System Reports</h3>
+                <p>View analytics and system performance</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>View reports
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div id="mainContent" class="content-section" style="display: none;">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3 mt-5">
+        <div class="container text-center">
+            <small>&copy; 2024 MediCare. All rights reserved.</small>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadAdminDashboard();
+            updateDashboardStats();
+            setCurrentDate();
+        });
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                window.location = 'index.html';
+            }
+        }
+
+        function updateDashboardStats() {
+            // This would normally fetch from API
+            // For now, just set placeholders
+            document.getElementById('totalUsers').textContent = '1,247';
+            document.getElementById('activeDoctors').textContent = '23';
+            document.getElementById('totalAppointments').textContent = '3,456';
+            document.getElementById('systemRevenue').textContent = '$45,230';
+        }
+
+        function setCurrentDate() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent =
+                now.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+        }
+
+        function showUserManagement() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'user-management') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'user-management';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-users-cog me-2"></i>User Management</h2>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success" onclick="addNewUser()">
+                            <i class="fas fa-plus me-1"></i>Add User
+                        </button>
+                        <input type="text" class="form-control" placeholder="Search users..." style="max-width: 300px;">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-search me-1"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">User Types</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="user-type-filter active" onclick="filterUsers('all')">
+                                    <i class="fas fa-users text-primary me-2"></i>All Users (1,247)
+                                </div>
+                                <div class="user-type-filter" onclick="filterUsers('patients')">
+                                    <i class="fas fa-user text-success me-2"></i>Patients (987)
+                                </div>
+                                <div class="user-type-filter" onclick="filterUsers('doctors')">
+                                    <i class="fas fa-user-md text-info me-2"></i>Doctors (23)
+                                </div>
+                                <div class="user-type-filter" onclick="filterUsers('admins')">
+                                    <i class="fas fa-cog text-warning me-2"></i>Admins (5)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Users List</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Role</th>
+                                                <th>Status</th>
+                                                <th>Joined</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>John Smith</td>
+                                                <td>john@example.com</td>
+                                                <td><span class="badge bg-success">Patient</span></td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>Jan 15, 2024</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-warning me-1">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Dr. Sarah Johnson</td>
+                                                <td>sarah@hospital.com</td>
+                                                <td><span class="badge bg-info">Doctor</span></td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>Dec 3, 2023</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-warning me-1">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Admin User</td>
+                                                <td>admin@hospital.com</td>
+                                                <td><span class="badge bg-warning">Admin</span></td>
+                                                <td><span class="badge bg-success">Active</span></td>
+                                                <td>Nov 1, 2023</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-warning me-1">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showHospitalManagement() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'hospital-management') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'hospital-management';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-building me-2"></i>Hospital Management</h2>
+                    <button class="btn btn-primary" onclick="addNewHospital()">
+                        <i class="fas fa-plus me-1"></i>Add Hospital
+                    </button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Hospital Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Hospital Name</label>
+                                    <input type="text" class="form-control" value="MediCare General Hospital">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Address</label>
+                                    <textarea class="form-control" rows="3">123 Healthcare Avenue, Medical District, City 12345</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" value="+1 (555) 123-4567">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" value="info@medicare.com">
+                                </div>
+                                <button class="btn btn-success w-100">
+                                    <i class="fas fa-save me-1"></i>Update Information
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Departments</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="department-list">
+                                    <div class="department-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">Cardiology</h6>
+                                                <small class="text-muted">12 doctors, 45 beds</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-success">Active</span>
+                                                <button class="btn btn-sm btn-outline-primary ms-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="department-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">Neurology</h6>
+                                                <small class="text-muted">8 doctors, 30 beds</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-success">Active</span>
+                                                <button class="btn btn-sm btn-outline-primary ms-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="department-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">Emergency</h6>
+                                                <small class="text-muted">15 doctors, 20 beds</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-success">Active</span>
+                                                <button class="btn btn-sm btn-outline-primary ms-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-primary w-100 mt-3">
+                                    <i class="fas fa-plus me-1"></i>Add Department
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showAppointmentManagement() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'appointment-management') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'appointment-management';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-alt me-2"></i>Appointment Management</h2>
+                    <div class="d-flex gap-2">
+                        <select class="form-select" style="max-width: 200px;">
+                            <option>All Status</option>
+                            <option>Pending</option>
+                            <option>Confirmed</option>
+                            <option>Completed</option>
+                            <option>Cancelled</option>
+                        </select>
+                        <input type="date" class="form-control" style="max-width: 200px;">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-filter me-1"></i>Filter
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">All Appointments</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Patient</th>
+                                        <th>Doctor</th>
+                                        <th>Date & Time</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>John Smith</td>
+                                        <td>Dr. Sarah Johnson</td>
+                                        <td>Dec 15, 2024 - 10:00 AM</td>
+                                        <td><span class="badge bg-success">Confirmed</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-warning me-1">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mike Davis</td>
+                                        <td>Dr. Robert Wilson</td>
+                                        <td>Dec 15, 2024 - 2:30 PM</td>
+                                        <td><span class="badge bg-warning">Pending</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success me-1">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Emma Brown</td>
+                                        <td>Dr. Lisa Chen</td>
+                                        <td>Dec 14, 2024 - 9:15 AM</td>
+                                        <td><span class="badge bg-info">Completed</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-file-alt"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showSystemReports() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'system-reports') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'system-reports';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-bar me-2"></i>System Reports</h2>
+                    <div class="d-flex gap-2">
+                        <select class="form-select" style="max-width: 200px;">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Last 3 months</option>
+                            <option>Last year</option>
+                        </select>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-download me-1"></i>Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">User Registration Trends</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="userChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Appointment Statistics</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="appointmentChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Revenue Report</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="revenue-summary">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Total Revenue:</span>
+                                        <strong class="text-success">$45,230</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>This Month:</span>
+                                        <strong>$12,450</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Last Month:</span>
+                                        <strong>$11,890</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Growth:</span>
+                                        <strong class="text-success">+4.7%</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">System Health</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="system-health">
+                                    <div class="health-item">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Server Status:</span>
+                                            <span class="badge bg-success">Online</span>
+                                        </div>
+                                        <div class="progress mb-2">
+                                            <div class="progress-bar bg-success" style="width: 98%"></div>
+                                        </div>
+                                        <small class="text-muted">Uptime: 99.8%</small>
+                                    </div>
+
+                                    <div class="health-item mt-3">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Database:</span>
+                                            <span class="badge bg-success">Healthy</span>
+                                        </div>
+                                        <div class="progress mb-2">
+                                            <div class="progress-bar bg-success" style="width: 95%"></div>
+                                        </div>
+                                        <small class="text-muted">Response time: 45ms</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addNewUser() {
+            alert('Add new user functionality would open a modal or navigate to user creation page');
+        }
+
+        function addNewHospital() {
+            alert('Add new hospital functionality would open a modal or navigate to hospital creation page');
+        }
+
+        function filterUsers(type) {
+            // This would filter the users table based on type
+            alert('Filtering users by type: ' + type);
+        }
+    </script>
+</body>
+</html>
