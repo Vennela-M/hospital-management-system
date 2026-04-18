@@ -28,17 +28,25 @@ router.get("/stats", async (req, res) => {
 
 // APPOINTMENTS
 router.get("/appointments", async (req, res) => {
-  const data = await Appointment.find()
-    .populate("patient")
-    .populate("doctor");
+  try {
+    const data = await Appointment.find()
+      .populate("patient")
+      .populate("doctor");
 
-  res.json(data);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // BEDS
 router.get("/beds", async (req, res) => {
-  const beds = await Bed.find().populate("patient");
-  res.json(beds);
+  try {
+    const beds = await Bed.find().populate("patient");
+    res.json(beds);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

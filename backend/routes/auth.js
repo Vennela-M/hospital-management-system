@@ -17,28 +17,30 @@ const upload = multer({ storage: storage });
 // 🔹 SIGNUP
 router.post("/signup", async (req, res) => {
     try {
-        const { name, email, phone, password } = req.body;
-
-        const user = new User({
-            name,
-            email,
-            phone,
-            password,
-            role: "user"
-        });
-
-        await user.save();
-
-        res.json({ message: "✅ User Registered Successfully" });
-    } catch (error) {
-        res.json({ message: "❌ Error in Signup" });
+      const { name, email, password, role } = req.body;
+  
+      const user = new User({
+        name,
+        email,
+        password,
+        role
+      });
+  
+      await user.save();
+  
+      res.status(201).json(user);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
     }
-});
+  });
 
 
 // 🔹 LOGIN
 router.post("/login", async (req, res) => {
     const { email, phone, password } = req.body;
+    if ((!email && !phone) || !password) {
+        return res.status(400).json({ message: "email or phone and password are required" });
+    }
 
     try {
         let user;
@@ -52,23 +54,19 @@ router.post("/login", async (req, res) => {
         }
 
         if (!user) {
-            return res.json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
         if (user.password !== password) {
-            return res.json({ message: "Invalid password" });
+            return res.status(401).json({ message: "Invalid password" });
         }
-
         res.json({
             message: "Login successful",
-            role: user.role,
-            name: user.name,
-            email: user.email,
-            phone: user.phone
+            ...user._doc
         });
 
     } catch (err) {
-        res.json({ message: "Error in login" });
+        res.status(500).json({ message: "Error in login" });
     }
 });
 
@@ -76,6 +74,9 @@ router.post("/login", async (req, res) => {
 // 🔹 RESET PASSWORD
 router.post("/reset", async (req, res) => {
     const { email, phone, newPassword } = req.body;
+    if ((!email && !phone) || !newPassword) {
+        return res.status(400).json({ message: "email or phone and newPassword are required" });
+    }
 
     try {
         let user;
@@ -89,7 +90,7 @@ router.post("/reset", async (req, res) => {
         }
 
         if (!user) {
-            return res.json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
         user.password = newPassword;
@@ -98,72 +99,58 @@ router.post("/reset", async (req, res) => {
         res.json({ message: "Password updated successfully" });
 
     } catch (err) {
-        res.json({ message: "Error resetting password" });
+        res.status(500).json({ message: "Error resetting password" });
     }
 });
 
+//UPDATE PROFILE
 
-// 🔥 UPDATE PROFILE (VERY IMPORTANT)
 router.post("/updateProfile", async (req, res) => {
-    const { 
-        email, 
-        phone, 
-        name, 
-        age, 
-        gender, 
+    try {
+      const {
+        email,
+        name,
+        phone,
+        age,
+        gender,
         bloodGroup,
-        address, 
-        diseases, 
-        allergies, 
-        medications,
         height,
         weight,
+        diseases,
+        allergies,
+        medications,
         surgeries,
-        conditions,
-        reports
-    } = req.body;
-
-    try {
-        let user;
-
-        // 🔍 Find user by email or phone
-        if (email) {
-            user = await User.findOne({ email });
-        }
-
-        if (!user && phone) {
-            user = await User.findOne({ phone });
-        }
-
-        if (!user) {
-            return res.json({ message: "User not found" });
-        }
-
-        // 🔥 Update fields
-        user.name = name;
-        user.phone = phone;
-        user.age = age;
-        user.gender = gender;
-        user.bloodGroup = bloodGroup;
-
-        user.height = height;
-        user.weight = weight;
-        user.address = address;
-        
-        user.diseases = diseases;
-        user.allergies = allergies;
-        user.medications = medications;
-        user.surgeries = surgeries;
-        user.conditions = conditions;
-        await user.save();
-
-        res.json({ message: "Profile updated successfully" });
-
+        emergencyContactName,
+        emergencyContactNumber
+      } = req.body;
+  
+      const user = await User.findOneAndUpdate(
+        { email },
+        {
+          name,
+          phone,
+          age,
+          gender,
+          bloodGroup,
+          height,
+          weight,
+          diseases,
+          allergies,
+          medications,
+          surgeries,
+          emergencyContactName,
+          emergencyContactNumber
+        },
+        { new: true }
+      );
+  
+      res.json({ message: "Profile updated successfully", user });
+  
     } catch (err) {
-        res.json({ message: "Error updating profile" });
+      console.error(err);
+      res.status(500).json({ message: "Error updating profile" });
     }
-});
-
+  });
 // 🔹 GET PROFILE
 router.get("/getProfile/:value", async (req, res) => {
     try {
@@ -179,13 +166,13 @@ router.get("/getProfile/:value", async (req, res) => {
         }
 
         if (!user) {
-            return res.json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
         res.json(user);
 
     } catch (err) {
-        res.json({ message: "Error fetching profile" });
+        res.status(500).json({ message: "Error fetching profile" });
     }
 });
 
@@ -198,7 +185,8 @@ router.post("/uploadReport", upload.single("report"), async (req, res) => {
         if (email) user = await User.findOne({ email });
         if (!user && phone) user = await User.findOne({ phone });
 
-        if (!user) return res.json({ message: "User not found" });
+        if (!user) return res.status(404).json({ message: "User not found" });
+        if (!req.file) return res.status(400).json({ message: "report file is required" });
 
         if (!user.reports) user.reports = [];
 
@@ -206,10 +194,10 @@ router.post("/uploadReport", upload.single("report"), async (req, res) => {
 
         await user.save();
 
-        res.json({ message: "Report uploaded", file: req.file.filename });
+        res.status(201).json({ message: "Report uploaded", file: req.file.filename });
 
     } catch (err) {
-        res.json({ message: "Upload error" });
+        res.status(500).json({ message: "Upload error" });
     }
 });
 module.exports = router;

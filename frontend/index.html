@@ -1,18 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Hospital System</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Hospital Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-light d-flex justify-content-center align-items-center vh-100">
+<body class="bg-light">
 
-<div class="text-center p-5 bg-white shadow rounded">
-  <h1 class="mb-4">🏥 Hospital Management System</h1>
+<!-- 🔹 NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+    <a class="navbar-brand">Hospital System</a>
 
-  <a href="login.html" class="btn btn-primary m-2 px-4">Login</a>
-  <a href="signup.html" class="btn btn-success m-2 px-4">Signup</a>
+    <div class="ms-auto">
+        <button class="btn btn-outline-light me-2">About</button>
+        <button class="btn btn-outline-light me-2">FAQs</button>
+        <button class="btn btn-outline-light me-2">Support</button>
+
+        <select class="form-select d-inline w-auto">
+            <option>EN</option>
+            <option>Telugu</option>
+            <option>Hindi</option>
+        </select>
+    </div>
+</nav>
+
+<!-- 🔹 MAIN SECTION -->
+<div class="container text-center mt-5">
+
+    <h2 class="mb-3">Welcome to Hospital Management System</h2>
+    <p class="text-muted">Manage your appointments, doctors, and health records easily</p>
+
+    <div class="mt-4">
+        <button class="btn btn-primary w-50 p-3" onclick="selectRole('user')">
+            Continue as Patient
+        </button>
+    </div>
+
 </div>
+
+<!-- 🔹 SCRIPT -->
+<script>
+function selectRole(role) {
+    localStorage.setItem("role", role);
+    window.location = "login.html";
+}
+</script>
 
 </body>
 </html>
