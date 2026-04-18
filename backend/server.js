@@ -26,8 +26,7 @@ app.use("/api/beds", require("./routes/bedRoutes"));
 
 app.use("/api/admin", require("./routes/adminRoutes"));
 app.use("/api/hospital", require("./routes/hospitalRoutes"));
-
-app.use("/api/user", require("./uploads/user")); // upload route
+const userRoute = require("./routes/user");
 
 // ✅ FILE UPLOAD ACCESS
 app.use("/uploads", express.static("uploads"));
