@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospitals Near You - MediCare</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+    <style>
+        .hospital-card-list {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .hospital-detail-card {
+            cursor: pointer;
+        }
+
+        .hospital-detail-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.25) !important;
+            border: 1px solid rgba(102, 126, 234, 0.2) !important;
+        }
+        
+        .location-search {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+        
+        .no-hospitals {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <i class="fas fa-hospital text-primary me-2"></i>
+                <span class="fw-bold">MediCare</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="hospitals-near.html">Nearby Hospitals</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="userLink" href="login.html">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="hospital-card-list">
+        <div class="container">
+            <!-- Header -->
+            <div class="mb-5">
+                <h1 class="text-white mb-2">
+                    <i class="fas fa-map-location-dot me-3"></i>Hospitals Available Near You
+                </h1>
+                <p class="text-light">Find and book appointments at hospitals in your area</p>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="location-search">
+                <div class="row">
+                    <div class="col-md-6">
+                        <button class="btn btn-primary w-100" id="getLocationBtn" onclick="getLocationAndHospitals()">
+                            <i class="fas fa-location-crosshairs me-2"></i>Find Hospitals Near Me
+                        </button>
+                        <small class="d-block mt-2 text-muted">Click to access your location</small>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" id="distanceFilter" onchange="filterByDistance()">
+                            <option value="">All Distances</option>
+                            <option value="5">Within 5 km</option>
+                            <option value="10">Within 10 km</option>
+                            <option value="20">Within 20 km</option>
+                            <option value="50">Within 50 km</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Finding hospitals near you...</p>
+            </div>
+
+            <!-- Hospitals List -->
+            <div id="hospitalsList"></div>
+
+            <!-- No Hospitals Message -->
+            <div id="noHospitals" class="no-hospitals" style="display: none;">
+                <i class="fas fa-map-pin fa-3x mb-3 text-muted"></i>
+                <h5>No hospitals found</h5>
+                <p>Enable location access to see hospitals near you</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check if user is logged in
+        function updateUserLink() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userLink = document.getElementById('userLink');
+            if (user) {
+                userLink.href = user.role === 'doctor' ? 'doctor.html' : user.role === 'admin' ? 'admin.html' : 'user.html';
+                userLink.textContent = user.name + ' (' + user.role + ')';
+            }
+        }
+
+        // Haversine distance calculation
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Get location and fetch hospitals
+        function getLocationAndHospitals() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('hospitalsList').innerHTML = '';
+            document.getElementById('noHospitals').style.display = 'none';
+
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser. Using default location.');
+                fetchAndDisplayHospitals(17.3850, 78.4867); // Hyderabad default
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    fetchAndDisplayHospitals(lat, lon);
+                },
+                error => {
+                    console.log('Geolocation error:', error);
+                    // Use default location if permission denied
+                    fetchAndDisplayHospitals(17.3850, 78.4867);
+                }
+            );
+        }
+
+        // Fetch and display hospitals
+        async function fetchAndDisplayHospitals(userLat, userLon) {
+            try {
+                const res = await fetch('http://localhost:5000/api/hospital/availability');
+                const data = await res.json();
+
+                document.getElementById('loading').style.display = 'none';
+
+                if (!data || !data.hospitals || data.hospitals.length === 0) {
+                    // Try alternate endpoint if primary fails
+                    try {
+                        const res2 = await fetch('http://localhost:5000/api/hospital');
+                        const data2 = await res2.json();
+                        if (data2.hospitals && data2.hospitals.length > 0) {
+                            displayHospitalsFromData(data2.hospitals, userLat, userLon);
+                            return;
+                        }
+                    } catch (e) {
+                        console.log('Alternate endpoint failed:', e);
+                    }
+                    
+                    document.getElementById('noHospitals').style.display = 'block';
+                    return;
+                }
+
+                displayHospitalsFromData(data.hospitals, userLat, userLon);
+            } catch (err) {
+                console.error('Error fetching hospitals:', err);
+                document.getElementById('loading').style.display = 'none';
+                
+                // Try alternate endpoint
+                try {
+                    const res = await fetch('http://localhost:5000/api/hospital');
+                    const data = await res.json();
+                    if (data.hospitals && data.hospitals.length > 0) {
+                        displayHospitalsFromData(data.hospitals, userLat, userLon);
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Fallback failed:', e);
+                }
+                
+                document.getElementById('noHospitals').style.display = 'block';
+            }
+        }
+
+        function displayHospitalsFromData(hospitals, userLat, userLon) {
+            // Calculate distances and sort
+            let hospitalList = hospitals.map(h => ({
+                ...h,
+                distance: calculateDistance(userLat, userLon, h.latitude || 17.3850, h.longitude || 78.4867),
+                availableBeds: h.availableBeds || h.totalBeds || 150,
+                totalBeds: h.totalBeds || 200,
+                activeDepartments: h.activeDepartments || h.departments || [],
+                doctorCount: h.doctorCount || 0,
+                address: h.address || 'Hyderabad'
+            }));
+
+            hospitalList.sort((a, b) => a.distance - b.distance);
+            window.allHospitals = hospitalList;
+
+            displayHospitals(hospitalList);
+        }
+
+        // Display hospitals
+        function displayHospitals(hospitals) {
+            const container = document.getElementById('hospitalsList');
+            container.innerHTML = '';
+
+            if (hospitals.length === 0) {
+                document.getElementById('noHospitals').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('noHospitals').style.display = 'none';
+
+            const gridHTML = hospitals.map(hospital => {
+                const availableBeds = hospital.availableBeds || 150;
+                const totalBeds = hospital.totalBeds || 200;
+                const occupiedBeds = totalBeds - availableBeds;
+                const bedPercentage = (availableBeds / totalBeds) * 100;
+                const deptCount = hospital.activeDepartments ? hospital.activeDepartments.length : 0;
+                const doctorCount = hospital.doctorCount || 0;
+
+                return `
+                <div class="col-lg-6 col-md-12 mb-4">
+                    <div class="card hospital-detail-card shadow-sm border-0" style="border-radius: 12px; overflow: hidden; transition: all 0.3s ease;">
+                        <div class="card-body p-4">
+                            <!-- Hospital Header -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title fw-bold mb-1">${hospital.name}</h5>
+                                    <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                                        <i class="fas fa-map-pin me-1" style="color: #667eea;"></i>${hospital.address}
+                                    </p>
+                                </div>
+                                <span class="badge bg-success" style="font-size: 0.85rem; padding: 0.5rem 0.75rem;">
+                                    <i class="fas fa-location-dot me-1"></i>${hospital.distance.toFixed(1)} km
+                                </span>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Quick Stats -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div style="text-align: center; padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                                        <div style="font-size: 1.3rem; font-weight: bold; color: #28a745;">${availableBeds}</div>
+                                        <small style="color: #666;">Available Beds</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div style="text-align: center; padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                                        <div style="font-size: 1.3rem; font-weight: bold; color: #dc3545;">${occupiedBeds}</div>
+                                        <small style="color: #666;">Occupied Beds</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bed Progress -->
+                            <div class="mb-3">
+                                <div style="font-size: 0.85rem; font-weight: 500; margin-bottom: 5px;">Bed Occupancy</div>
+                                <div class="progress" style="height: 8px; border-radius: 4px; background: #e9ecef;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: ${bedPercentage}%;" aria-valuenow="${bedPercentage}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <small style="color: #666;">${Math.round(bedPercentage)}% Available</small>
+                            </div>
+
+                            <hr class="my-3">
+
+                            <!-- Departments and Doctors -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div style="text-align: center; padding: 10px;">
+                                        <i class="fas fa-stethoscope" style="font-size: 1.5rem; color: #0d6efd;"></i>
+                                        <div style="font-size: 1.1rem; font-weight: bold; margin-top: 5px;">${deptCount}</div>
+                                        <small style="color: #666;">Departments</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div style="text-align: center; padding: 10px;">
+                                        <i class="fas fa-user-md" style="font-size: 1.5rem; color: #198754;"></i>
+                                        <div style="font-size: 1.1rem; font-weight: bold; margin-top: 5px;">${doctorCount}</div>
+                                        <small style="color: #666;">Doctors</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Info -->
+                            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                                <div style="font-size: 0.85rem; margin-bottom: 8px;">
+                                    <i class="fas fa-phone" style="color: #667eea; width: 18px;"></i>
+                                    <a href="tel:${hospital.phone}" style="text-decoration: none; color: #0d6efd;">${hospital.phone}</a>
+                                </div>
+                                <div style="font-size: 0.85rem;">
+                                    <i class="fas fa-envelope" style="color: #667eea; width: 18px;"></i>
+                                    <a href="mailto:${hospital.email}" style="text-decoration: none; color: #0d6efd;">${hospital.email}</a>
+                                </div>
+                            </div>
+
+                            <!-- Departments List -->
+                            ${hospital.activeDepartments && hospital.activeDepartments.length > 0 ? `
+                            <div style="margin-bottom: 15px;">
+                                <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">Departments:</div>
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    ${hospital.activeDepartments.slice(0, 4).map(dept => 
+                                        `<span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-size: 0.75rem; padding: 0.4rem 0.7rem;">${dept}</span>`
+                                    ).join('')}
+                                </div>
+                            </div>
+                            ` : ''}
+
+                            <!-- Book Button -->
+                            <button class="btn w-100 py-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: 500; transition: all 0.3s ease;" onclick="bookAtHospital('${hospital._id}', '${hospital.name}')" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                                <i class="fas fa-calendar-check me-2"></i>Book Appointment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `<div class="row">${gridHTML}</div>`;
+        }
+
+        // Filter by distance
+        function filterByDistance() {
+            const distance = document.getElementById('distanceFilter').value;
+            if (!window.allHospitals || window.allHospitals.length === 0) {
+                document.getElementById('noHospitals').style.display = 'block';
+                return;
+            }
+
+            let filtered = window.allHospitals;
+            if (distance) {
+                filtered = window.allHospitals.filter(h => h.distance <= parseInt(distance));
+            }
+
+            if (filtered.length === 0) {
+                document.getElementById('hospitalsList').innerHTML = '';
+                document.getElementById('noHospitals').style.display = 'block';
+            } else {
+                document.getElementById('noHospitals').style.display = 'none';
+                displayHospitals(filtered);
+            }
+        }
+
+        // Book appointment at hospital
+        function bookAtHospital(hospitalId, hospitalName) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                alert('Please login first');
+                window.location = 'login.html';
+                return;
+            }
+
+            // Store hospital info and redirect to booking
+            localStorage.setItem('selectedHospital', JSON.stringify({
+                _id: hospitalId,
+                name: hospitalName
+            }));
+            
+            window.location = user.role === 'user' ? 'user.html' : 'login.html';
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            updateUserLink();
+        });
+    </script>
+</body>
+</html>

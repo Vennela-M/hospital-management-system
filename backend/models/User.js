@@ -2,6 +2,22 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
 
+  // 🔹 UNIQUE PATIENT ID (for reference - patients only)
+  patientId: { 
+    type: String, 
+    unique: true, 
+    sparse: true,
+    default: null 
+  },
+
+  // 🔹 UNIQUE DOCTOR ID (for reference - doctors only)
+  doctorId: { 
+    type: String, 
+    unique: true, 
+    sparse: true,
+    default: null 
+  },
+
   // 🔹 BASIC INFO
   name: { type: String, default: "" },
   email: { type: String, default: "" },
@@ -41,7 +57,34 @@ const userSchema = new mongoose.Schema({
   reports: {
     type: [String],
     default: []
-  }
+  },
+
+  availability: {
+    type: Object,
+    default: {
+      monday: [],
+      tuesday: [],
+      wednesday: [],
+      thursday: [],
+      friday: [],
+      saturday: [],
+      sunday: []
+    }
+  },
+
+  questions: [
+    {
+      patient: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      question: { type: String, default: "" },
+      answer: { type: String, default: "" },
+      status: {
+        type: String,
+        enum: ["open", "answered"],
+        default: "open"
+      },
+      createdAt: { type: Date, default: Date.now }
+    }
+  ]
 
 }, { timestamps: true });
 

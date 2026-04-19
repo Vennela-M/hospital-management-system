@@ -15,7 +15,7 @@
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <i class="fas fa-hospital text-primary me-2"></i>
-                <span class="fw-bold">MediCare</span>
+                <span class="fw-bold">AroVyuha</span>
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -25,22 +25,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#features">Features</a>
+                        <a id="navFeatures" class="nav-link" href="#features">Features</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
+                        <a id="navAbout" class="nav-link" href="#about">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
+                        <a id="navContact" class="nav-link" href="#contact">Contact</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-globe me-1"></i>EN
+                            <i class="fas fa-globe me-1"></i><span id="languageLabel">EN</span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">English</a></li>
-                            <li><a class="dropdown-item" href="#">Telugu</a></li>
-                            <li><a class="dropdown-item" href="#">Hindi</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="setLanguage('en')">English</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="setLanguage('te')">Telugu</a></li>
+                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="setLanguage('hi')">Hindi</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -48,24 +48,26 @@
         </div>
     </nav>
 
+    <main class="page-content">
+
     <!-- Hero Section -->
     <section class="hero-section py-5">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold text-white mb-4">
+                    <h1 id="heroTitle" class="display-4 fw-bold text-white mb-4">
                         Your Health, <span class="text-info">Our Priority</span>
                     </h1>
-                    <p class="lead text-white-50 mb-4">
+                    <p id="heroSubtitle" class="lead text-white-50 mb-4">
                         Experience seamless healthcare management with our comprehensive hospital management system.
                         Book appointments, manage records, and connect with healthcare professionals effortlessly.
                     </p>
-                    <div class="d-flex gap-3">
-                        <button class="btn btn-primary btn-lg px-4" onclick="selectRole('user')">
-                            <i class="fas fa-user-injured me-2"></i>Get Started as Patient
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button id="heroPrimaryButton" class="btn btn-primary btn-lg px-4" onclick="selectRole('user')">
+                            <i class="fas fa-user-injured me-2"></i><span id="heroPrimaryText">Get Started as Patient</span>
                         </button>
-                        <button class="btn btn-outline-light btn-lg px-4" onclick="showLoginOptions()">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        <button id="heroSecondaryButton" class="btn btn-outline-light btn-lg px-4" onclick="showLoginOptions()">
+                            <i class="fas fa-sign-in-alt me-2"></i><span id="heroSecondaryText">Login</span>
                         </button>
                     </div>
                 </div>
@@ -82,8 +84,8 @@
     <section id="features" class="py-5 bg-white">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold text-dark mb-3">Why Choose MediCare?</h2>
-                <p class="lead text-muted">Comprehensive healthcare management solutions for everyone</p>
+                <h2 id="featuresTitle" class="display-5 fw-bold text-dark mb-3">Why Choose AroVyuha?</h2>
+                <p id="featuresSubtitle" class="lead text-muted">Comprehensive healthcare management solutions for everyone</p>
             </div>
 
             <div class="row g-4">
@@ -126,36 +128,128 @@
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="py-5 bg-primary text-white">
+    <!-- Hospital Availability Section -->
+    <section id="availability" class="py-5 bg-light">
         <div class="container">
-            <div class="row text-center g-4">
-                <div class="col-md-3">
-                    <div class="stat-number display-4 fw-bold mb-2">10K+</div>
-                    <div class="stat-label">Happy Patients</div>
+            <div class="text-center mb-5">
+                <h2 id="availabilityTitle" class="display-5 fw-bold text-dark mb-3">Hospital Availability</h2>
+                <p id="availabilityDescription" class="lead text-muted">Check where beds, doctors, and departments are available across hospitals.</p>
+                <a href="hospitals-near.html" class="btn btn-info mt-3">
+                    <i class="fas fa-map-location-dot me-2"></i>View Hospitals Near You
+                </a>
+            </div>
+            <div class="row text-center g-4 mb-4" id="availabilityCards">
+                <div class="col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="availabilityHospitals">0</div>
+                        <div class="stat-label">Hospitals</div>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="stat-number display-4 fw-bold mb-2">500+</div>
-                    <div class="stat-label">Expert Doctors</div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="availabilityTotalBeds">0</div>
+                        <div class="stat-label">Total Beds</div>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="stat-number display-4 fw-bold mb-2">50+</div>
-                    <div class="stat-label">Specialties</div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="availabilityFreeBeds">0</div>
+                        <div class="stat-label">Available Beds</div>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="stat-number display-4 fw-bold mb-2">24/7</div>
-                    <div class="stat-label">Support</div>
+                <div class="col-sm-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="availabilityDoctors">0</div>
+                        <div class="stat-label">Doctors</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4" id="hospitalList">
+                <div class="col-12 text-center">
+                    <p class="text-muted">Loading hospital availability...</p>
                 </div>
             </div>
         </div>
     </section>
+
+
+
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-white">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-6">
+                    <h2 id="aboutTitle" class="section-title">About AroVyuha</h2>
+                    <p id="aboutPara1" class="text-muted">AroVyuha is built to help communities access medical care faster and more efficiently. We connect patients, doctors, and hospitals through a single unified platform with real-time availability tracking, appointment management, and secure records.</p>
+                    <p id="aboutPara2" class="text-muted">Our platform supports hospital availability checking, department-level capacity details, and convenient access to care for every user.</p>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-heartbeat fa-2x text-primary me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Trusted Care</h5>
+                                <p class="mb-0 text-muted">Reliable hospital data and transparent availability details.</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-user-friends fa-2x text-success me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Patient First</h5>
+                                <p class="mb-0 text-muted">Designed for simple, fast access to healthcare services.</p>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-globe fa-2x text-info me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Multilingual</h5>
+                                <p class="mb-0 text-muted">Available in English, Telugu, and Hindi for wider accessibility.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 id="contactTitle" class="display-5 fw-bold text-dark mb-3">Contact Us</h2>
+                <p id="contactDescription" class="lead text-muted">Reach out for support, questions, or more information about AroVyuha.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="contact-card">
+                        <h4>Head Office</h4>
+                        <p>123 Health St, Medical City, Country</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="contact-card">
+                        <h4>Phone</h4>
+                        <p>+1 (555) 123-4567</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="contact-card">
+                        <h4>Email</h4>
+                        <p>info@AroVyuha.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </main>
 
     <!-- Footer -->
     <footer class="bg-dark text-white py-4">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5 class="fw-bold mb-3">MediCare</h5>
+                    <h5 class="fw-bold mb-3">AroVyuha</h5>
                     <p class="text-white-50">Your trusted partner in healthcare management. Experience the future of medical care today.</p>
                 </div>
                 <div class="col-md-3">
@@ -171,14 +265,14 @@
                     <h6 class="fw-bold mb-3">Contact Info</h6>
                     <ul class="list-unstyled text-white-50">
                         <li><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</li>
-                        <li><i class="fas fa-envelope me-2"></i>info@medicare.com</li>
+                        <li><i class="fas fa-envelope me-2"></i>info@AroVyuha.com</li>
                         <li><i class="fas fa-map-marker-alt me-2"></i>123 Health St, Medical City</li>
                     </ul>
                 </div>
             </div>
             <hr class="my-4">
             <div class="text-center text-white-50">
-                <p>&copy; 2024 MediCare. All rights reserved.</p>
+                <p>&copy; 2024 AroVyuha. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -186,6 +280,95 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const translations = {
+            en: {
+                navFeatures: 'Features',
+                navAbout: 'About',
+                navContact: 'Contact',
+                languageLabel: 'EN',
+                heroTitle: 'Your Health, Our Priority',
+                heroSubtitle: 'Experience seamless healthcare management with our comprehensive hospital management system. Book appointments, manage records, and connect with healthcare professionals effortlessly.',
+                heroPrimaryText: 'Get Started as Patient',
+                heroSecondaryText: 'Login',
+                featuresTitle: 'Why Choose AroVyuha?',
+                featuresSubtitle: 'Comprehensive healthcare management solutions for everyone',
+                availabilityTitle: 'Hospital Availability',
+                availabilityDescription: 'Check where beds, doctors, and departments are available across hospitals.',
+                aboutTitle: 'About AroVyuha',
+                aboutPara1: 'AroVyuha is built to help communities access medical care faster and more efficiently. We connect patients, doctors, and hospitals through a single unified platform with real-time availability tracking, appointment management, and secure records.',
+                aboutPara2: 'Our platform supports hospital availability checking, department-level capacity details, and convenient access to care for every user.',
+                contactTitle: 'Contact Us',
+                contactDescription: 'Reach out for support, questions, or more information about AroVyuha.'
+            },
+            te: {
+                navFeatures: 'ఫీచర్లు',
+                navAbout: 'గురించి',
+                navContact: 'సంపర్కించండి',
+                languageLabel: 'తెలుగు',
+                heroTitle: 'మీ ఆరోగ్యం, మా ప్రాధాన్యత',
+                heroSubtitle: 'మా సమగ్ర ఆసుపత్రి నిర్వహణ వ్యవస్థ ద్వారా నిరబాధ ఆరోగ్య సేవా నిర్వహణకు చేరండి. నియమితాలను బుక్ చేయండి, రికార్డులను నిర్వహించండి మరియు వైద్యుల వారితో సులభంగా అనుసంధానం కోసం.',
+                heroPrimaryText: 'రోగిగా ప్రారంభించండి',
+                heroSecondaryText: 'ప్రవేశించండి',
+                featuresTitle: 'మీరు AroVyuha ఎందుకు ఎంచుకోవాలి?',
+                featuresSubtitle: 'ప్రతిఒక్కరికి సమగ్ర ఆరోగ్య సేవా సమాధానాలు',
+                availabilityTitle: 'ఆసుపత్రి అందుబాటు',
+                availabilityDescription: 'ఆసుపత్రుల్లో పడకలు, డాక్టర్లు, విభాగాలు ఎక్కడ అందుబాటులో ఉన్నాయో చెక్ చేయండి.',
+                aboutTitle: 'AroVyuha గురించి',
+                aboutPara1: 'AroVyuha సమాజాలకు వైద్య సేవలకు వేగంగా మరియు సమర్థవంతంగా యాక్సెస్ అందించడానికి రూపొందించబడింది. మేము రియల్‌టైమ్ అందుబాటు ట్రాకింగ్, నియామకం నిర్వహణ మరియు సురక్షిత రికార్డ్‌లతో రోగులు, డాక్టర్‌లు మరియు ఆసుపత్రులను ఒక ప్ల్యాట్‌ఫారమ్‌లో కనెక్ట్ చేస్తాము.',
+                aboutPara2: 'మా ప్ల్యాట్‌ఫార్మ్ ఆసుపత్రి అందుబాటు తనిఖీ, విభాగ-స్థాయి సామర్థ్య వివరాలు, మరియు ప్రతిఒక్కరికి సౌకర్యవంతమైన సేవా యాక్సెస్‌కు ఆధారం ఇస్తుంది.',
+                contactTitle: 'మమ్మల్ని సంపర్కించండి',
+                contactDescription: 'సహాయం, ప్రశ్నలు, లేదా AroVyuha గురించి మరిన్ని సమాచారానికి సంపర్కించండి.'
+            },
+            hi: {
+                navFeatures: 'विशेषताएँ',
+                navAbout: 'के बारे में',
+                navContact: 'सम्पर्क',
+                languageLabel: 'हिंदी',
+                heroTitle: 'आपका स्वास्थ्य, हमारी प्राथमिकता',
+                heroSubtitle: 'हमारी व्यापक अस्पताल प्रबंधन प्रणाली के साथ निर्बाध स्वास्थ्य देखभाल प्रबंधन का अनुभव करें। अपॉइंटमेंट बुक करें, रिकॉर्ड प्रबंधित करें, और स्वास्थ्य पेशेवरों से आसानी से जुड़ें।',
+                heroPrimaryText: 'रोगी के रूप में शुरू करें',
+                heroSecondaryText: 'लॉगिन',
+                featuresTitle: 'AroVyuha क्यों चुनें?',
+                featuresSubtitle: 'हर किसी के लिए समग्र स्वास्थ्य देखभाल समाधान',
+                availabilityTitle: 'अस्पताल उपलब्धता',
+                availabilityDescription: 'देखें कहाँ बिस्तर, डॉक्टर और विभाग अस्पतालों में उपलब्ध हैं।',
+                aboutTitle: 'AroVyuha के बारे में',
+                aboutPara1: 'AroVyuha को समुदायों को चिकित्सा देखभाल तक तेज और अधिक कुशल पहुंच प्रदान करने में मदद करने के लिए बनाया गया है। हम वास्तविक समय उपलब्धता ट्रैकिंग, नियुक्ति प्रबंधन और सुरक्षित रिकॉर्ड के साथ रोगियों, डॉक्टरों और अस्पतालों को एक मंच पर जोड़ते हैं।',
+                aboutPara2: 'हमारा प्लेटफ़ॉर्म अस्पताल उपलब्धता जाँच, विभाग-स्तर क्षमता विवरण, और प्रत्येक उपयोगकर्ता के लिए सुविधाजनक देखभाल पहुँच का समर्थन करता है।',
+                contactTitle: 'संपर्क करें',
+                contactDescription: 'मदद, प्रश्न, या AroVyuha के बारे में अधिक जानकारी के लिए संपर्क करें।'
+            }
+        };
+
+        function setLanguage(lang) {
+            const selected = translations[lang] ? lang : 'en';
+            const text = translations[selected];
+
+            document.getElementById('navFeatures').innerText = text.navFeatures;
+            document.getElementById('navAbout').innerText = text.navAbout;
+            document.getElementById('navContact').innerText = text.navContact;
+            document.getElementById('languageLabel').innerText = text.languageLabel;
+            document.getElementById('heroTitle').innerHTML = text.heroTitle;
+            document.getElementById('heroSubtitle').innerText = text.heroSubtitle;
+            document.getElementById('heroPrimaryText').innerText = text.heroPrimaryText;
+            document.getElementById('heroSecondaryText').innerText = text.heroSecondaryText;
+            document.getElementById('featuresTitle').innerText = text.featuresTitle;
+            document.getElementById('featuresSubtitle').innerText = text.featuresSubtitle;
+            document.getElementById('availabilityTitle').innerText = text.availabilityTitle;
+            document.getElementById('availabilityDescription').innerText = text.availabilityDescription;
+            document.getElementById('aboutTitle').innerText = text.aboutTitle;
+            document.getElementById('aboutPara1').innerText = text.aboutPara1;
+            document.getElementById('aboutPara2').innerText = text.aboutPara2;
+            document.getElementById('contactTitle').innerText = text.contactTitle;
+            document.getElementById('contactDescription').innerText = text.contactDescription;
+
+            localStorage.setItem('siteLanguage', selected);
+        }
+
+        function getSavedLanguage() {
+            return localStorage.getItem('siteLanguage') || 'en';
+        }
+
         function selectRole(role) {
             localStorage.setItem("role", role);
             window.location = "login.html";
@@ -195,16 +378,72 @@
             window.location = "login.html";
         }
 
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth'
-                    });
+        async function loadHospitalAvailability() {
+            try {
+                const response = await fetch("http://localhost:5000/api/hospital/availability");
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Unable to load hospital availability');
                 }
+
+                document.getElementById('availabilityHospitals').innerText = data.summary.totalHospitals;
+                document.getElementById('availabilityTotalBeds').innerText = data.summary.totalBeds;
+                document.getElementById('availabilityFreeBeds').innerText = data.summary.availableBeds;
+                document.getElementById('availabilityDoctors').innerText = data.summary.totalDoctors;
+
+                const hospitalList = document.getElementById('hospitalList');
+                if (data.hospitals.length === 0) {
+                    hospitalList.innerHTML = '<div class="col-12 text-center"><p class="text-muted">No hospital availability information available right now.</p></div>';
+                    return;
+                }
+
+                hospitalList.innerHTML = data.hospitals.map(hospital => `
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">${hospital.name}</h5>
+                                <p class="card-text text-muted mb-2">${hospital.address || 'Address not available'}</p>
+                                <div class="row text-center mt-4">
+                                    <div class="col-6 mb-3">
+                                        <div class="fw-bold">${hospital.availableBeds}</div>
+                                        <small class="text-muted">Available Beds</small>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <div class="fw-bold">${hospital.occupiedBeds}</div>
+                                        <small class="text-muted">Occupied Beds</small>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <div class="fw-bold">${hospital.departmentsCount}</div>
+                                        <small class="text-muted">Departments</small>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <div class="fw-bold">${hospital.doctorCount}</div>
+                                        <small class="text-muted">Doctors</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Availability error:', err);
+                document.getElementById('hospitalList').innerHTML = '<div class="col-12 text-center"><p class="text-danger">Unable to load availability data at the moment.</p></div>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHospitalAvailability();
+            setLanguage(getSavedLanguage());
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
             });
         });
     </script>

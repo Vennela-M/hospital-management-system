@@ -7,9 +7,10 @@ const AppointmentSchema = new mongoose.Schema({
   date: { type: String, required: true },
   time: { type: String, required: true },
   notes: { type: String, default: "" },
-  status: { type: String, enum: ["pending", "confirmed", "completed", "cancelled"], default: "pending" },
+  status: { type: String, enum: ["pending", "hold", "paid", "assigned", "confirmed", "completed", "cancelled"], default: "pending" },
   prescription: { type: String, default: "" },
-  nextVisitDate: { type: Date, default: null }
+  nextVisitDate: { type: Date, default: null },
+  paymentStatus: { type: String, enum: ["unpaid", "paid"], default: "unpaid" }
 }, { timestamps: true });
 
 module.exports = mongoose.model("Appointment", AppointmentSchema);
