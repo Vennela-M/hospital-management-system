@@ -689,6 +689,8 @@
                 alert("Network error");
             }
         }
+
+        function displayUsers(users) {
             const container = document.getElementById("usersListContainer");
             if (!users || !users.length) {
                 container.innerHTML = `
@@ -2015,13 +2017,11 @@
             } else {
             alert(data.message || "Doctor login failed");
             }
-            }catch(err){
+            } catch(err){
             console.error(err);
             alert("Server error");
-
             }
-
-            }
+        }
     </script>
     <div class="modal fade" id="doctorLoginModal" tabindex="-1">
         <div class="modal-dialog">
