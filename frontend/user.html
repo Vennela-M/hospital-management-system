@@ -107,8 +107,47 @@
                 </div>
             </div>
 
-            <div class="dashboard-card" onclick="showDoctors()">
+            <div class="dashboard-card" onclick="showProfile()">
                 <div class="dashboard-card-icon text-success">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3>My Profile</h3>
+                <p>Edit personal and medical details</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Edit details
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showMedicalRecords()">
+                <div class="dashboard-card-icon text-info">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <h3>Medical Records</h3>
+                <p>View reports, prescriptions, and health history</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>View records
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showReminders()">
+                <div class="dashboard-card-icon text-warning">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3>Reminders</h3>
+                <p>Manage medication and appointment reminders</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Set reminders
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showDoctors()">
+                <div class="dashboard-card-icon text-danger">
                     <i class="fas fa-user-md"></i>
                 </div>
                 <h3>Find Doctors</h3>
@@ -116,32 +155,6 @@
                 <div class="mt-auto">
                     <small class="text-muted">
                         <i class="fas fa-arrow-right me-1"></i>Find specialists
-                    </small>
-                </div>
-            </div>
-
-            <div class="dashboard-card" onclick="showProfile()">
-                <div class="dashboard-card-icon text-info">
-                    <i class="fas fa-id-card"></i>
-                </div>
-                <h3>My Profile</h3>
-                <p>Update personal and medical information</p>
-                <div class="mt-auto">
-                    <small class="text-muted">
-                        <i class="fas fa-arrow-right me-1"></i>Manage details
-                    </small>
-                </div>
-            </div>
-
-            <div class="dashboard-card" onclick="showMedicalRecords()">
-                <div class="dashboard-card-icon text-warning">
-                    <i class="fas fa-file-medical"></i>
-                </div>
-                <h3>Medical Records</h3>
-                <p>Access your complete health history</p>
-                <div class="mt-auto">
-                    <small class="text-muted">
-                        <i class="fas fa-arrow-right me-1"></i>View records
                     </small>
                 </div>
             </div>
@@ -271,53 +284,690 @@
 
             container.innerHTML = `
                 <div class="section-header">
-                    <h2><i class="fas fa-file-medical me-2"></i>Medical Records</h2>
-                    <button class="btn btn-primary" onclick="showProfile()">
-                        <i class="fas fa-plus me-1"></i>Upload Report
+                    <h2><i class="fas fa-file-medical me-2"></i>Medical Records & Prescriptions</h2>
+                    <button class="btn btn-success" onclick="showReportUploadModal()">
+                        <i class="fas fa-upload me-1"></i>Upload Report
                     </button>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Recent Reports</h5>
-                            </div>
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button">Reports</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="prescriptions-tab" data-bs-toggle="tab" data-bs-target="#prescriptions" type="button">Prescriptions</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="reports" role="tabpanel">
+                        <div id="reportsList" class="row gy-3"></div>
+                    </div>
+                    <div class="tab-pane fade" id="prescriptions" role="tabpanel">
+                        <div id="prescriptionsList" class="row gy-3"></div>
+                    </div>
+                </div>
+            `;
+
+            loadReports();
+            loadPrescriptions();
+        }
+
+        async function loadReports() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch(`http://localhost:5000/api/reports/patient/${user._id}`, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const reports = await response.json();
+
+                const container = document.getElementById('reportsList');
+                if (!Array.isArray(reports) || reports.length === 0) {
+                    container.innerHTML = `<div class="col-12"><div class="alert alert-info">No reports uploaded yet.</div></div>`;
+                    return;
+                }
+
+                container.innerHTML = reports.map(report => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
                             <div class="card-body">
-                                <div class="text-center py-5 text-muted">
-                                    <i class="fas fa-file-medical fa-3x mb-3"></i>
-                                    <p>No medical reports uploaded yet.</p>
-                                    <button class="btn btn-primary" onclick="showProfile()">
-                                        Upload Your First Report
-                                    </button>
-                                </div>
+                                <h6 class="card-title">${report.reportType}</h6>
+                                <p class="card-text small">${report.description || 'No description'}</p>
+                                <p class="text-muted small"><i class="fas fa-calendar me-1"></i>${new Date(report.createdAt).toLocaleDateString()}</p>
+                                <a href="${report.filePath}" target="_blank" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-download me-1"></i>Download
+                                </a>
                             </div>
                         </div>
                     </div>
+                `).join('');
+            } catch (err) {
+                console.error('Error loading reports:', err);
+                document.getElementById('reportsList').innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load reports.</div></div>`;
+            }
+        }
 
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Quick Stats</h5>
-                            </div>
+        async function loadPrescriptions() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch(`http://localhost:5000/api/prescriptions/patient/${user._id}`, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const prescriptions = await response.json();
+
+                const container = document.getElementById('prescriptionsList');
+                if (!Array.isArray(prescriptions) || prescriptions.length === 0) {
+                    container.innerHTML = `<div class="col-12"><div class="alert alert-info">No prescriptions available.</div></div>`;
+                    return;
+                }
+
+                container.innerHTML = prescriptions.map(rx => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>Total Reports:</span>
-                                    <strong>0</strong>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span>This Month:</span>
-                                    <strong>0</strong>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>Last Upload:</span>
-                                    <strong>N/A</strong>
-                                </div>
+                                <h6 class="card-title">${rx.doctor ? rx.doctor.name : 'Doctor'} - ${rx.doctor ? rx.doctor.specialization : 'Specialist'}</h6>
+                                <p class="card-text"><strong>Diagnosis:</strong> ${rx.diagnosis || 'N/A'}</p>
+                                <p class="card-text small"><strong>Medicines:</strong></p>
+                                <ul class="small mb-2">
+                                    ${rx.medications.map(med => `<li>${med.name} - ${med.dosage} ${med.frequency}</li>`).join('')}
+                                </ul>
+                                <p class="text-muted small"><i class="fas fa-calendar me-1"></i>${new Date(rx.createdAt).toLocaleDateString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Error loading prescriptions:', err);
+                document.getElementById('prescriptionsList').innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load prescriptions.</div></div>`;
+            }
+        }
+
+        function showReportUploadModal() {
+            const modalHtml = `
+                <div class="modal fade" id="uploadReportModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Upload Medical Report</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="reportUploadForm" enctype="multipart/form-data">
+                                    <div class="mb-3">
+                                        <label class="form-label">Report Type *</label>
+                                        <input type="text" id="reportType" class="form-control" placeholder="e.g., Blood Test, X-Ray" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea id="reportDescription" class="form-control" rows="2"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Upload File *</label>
+                                        <input type="file" id="reportFile" class="form-control" required>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-success" onclick="submitReportUpload()">Upload</button>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            new bootstrap.Modal(document.getElementById('uploadReportModal')).show();
+            document.getElementById('uploadReportModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        async function submitReportUpload() {
+            const formData = new FormData();
+            formData.append('reportType', document.getElementById('reportType').value);
+            formData.append('description', document.getElementById('reportDescription').value);
+            formData.append('file', document.getElementById('reportFile').files[0]);
+
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch(`http://localhost:5000/api/reports/upload/${user._id}`, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${user.token}` },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert('Report uploaded successfully');
+                    bootstrap.Modal.getInstance(document.getElementById('uploadReportModal')).hide();
+                    loadReports();
+                } else {
+                    alert('Failed to upload report');
+                }
+            } catch (err) {
+                console.error('Upload error:', err);
+                alert('Error uploading report');
+            }
+        }
+
+        function showProfile() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'profile') {
+                container.style.display = 'none';
+                return;
+            }
+
+            const user = JSON.parse(localStorage.getItem('user')) || {};
+            container.dataset.currentSection = 'profile';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-user-circle me-2"></i>My Profile</h2>
+                    <button class="btn btn-primary" onclick="editProfileMode(true)">
+                        <i class="fas fa-edit me-1"></i>Edit Profile
+                    </button>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Personal Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label"><strong>Name</strong></label>
+                                        <input type="text" id="profileName" class="form-control" value="${user.name || ''}" disabled>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label"><strong>Email</strong></label>
+                                        <input type="email" id="profileEmail" class="form-control" value="${user.email || ''}" disabled>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label"><strong>Phone</strong></label>
+                                        <input type="tel" id="profilePhone" class="form-control" value="${user.phone || ''}" disabled>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label"><strong>Patient ID</strong></label>
+                                        <input type="text" class="form-control" value="${user.patientId || ''}" disabled>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label"><strong>Age</strong></label>
+                                        <input type="number" id="profileAge" class="form-control" value="${user.age || ''}" disabled>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label"><strong>Gender</strong></label>
+                                        <select id="profileGender" class="form-select" disabled>
+                                            <option value="">Select</option>
+                                            <option value="Male" ${user.gender === 'Male' ? 'selected' : ''}>Male</option>
+                                            <option value="Female" ${user.gender === 'Female' ? 'selected' : ''}>Female</option>
+                                            <option value="Other" ${user.gender === 'Other' ? 'selected' : ''}>Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label"><strong>Blood Group</strong></label>
+                                        <input type="text" id="profileBloodGroup" class="form-control" value="${user.bloodGroup || ''}" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Physical Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label"><strong>Height</strong></label>
+                                        <input type="text" id="profileHeight" class="form-control" placeholder="e.g., 5'10\"" value="${user.height || ''}" disabled>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label"><strong>Weight</strong></label>
+                                        <input type="text" id="profileWeight" class="form-control" placeholder="e.g., 75 kg" value="${user.weight || ''}" disabled>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label"><strong>Address</strong></label>
+                                        <textarea id="profileAddress" class="form-control" rows="2" disabled>${user.address || ''}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Medical History</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Chronic Diseases / Conditions</strong></label>
+                                    <textarea id="profileDiseases" class="form-control" rows="2" placeholder="Enter diseases/conditions, one per line" disabled>${Array.isArray(user.diseases) ? user.diseases.join('\\n') : user.diseases || ''}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Allergies</strong></label>
+                                    <textarea id="profileAllergies" class="form-control" rows="2" placeholder="Enter allergies, one per line" disabled>${Array.isArray(user.allergies) ? user.allergies.join('\\n') : user.allergies || ''}</textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Emergency Contact Name</strong></label>
+                                    <input type="text" id="profileEmergencyName" class="form-control" value="${user.emergencyContactName || ''}" disabled>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Emergency Contact Number</strong></label>
+                                    <input type="tel" id="profileEmergencyPhone" class="form-control" value="${user.emergencyContactNumber || ''}" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="editButtons" style="display:none;" class="d-flex gap-2">
+                            <button class="btn btn-success" onclick="saveProfileChanges()">
+                                <i class="fas fa-save me-1"></i>Save Changes
+                            </button>
+                            <button class="btn btn-secondary" onclick="editProfileMode(false)">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editProfileMode(enabled) {
+            const fields = ['profileName', 'profileEmail', 'profilePhone', 'profileAge', 'profileGender', 'profileBloodGroup', 'profileHeight', 'profileWeight', 'profileAddress', 'profileDiseases', 'profileAllergies', 'profileEmergencyName', 'profileEmergencyPhone'];
+            fields.forEach(id => {
+                const elem = document.getElementById(id);
+                if (elem) elem.disabled = !enabled;
+            });
+            const editBtn = document.getElementById('editButtons');
+            if (editBtn) editBtn.style.display = enabled ? 'flex' : 'none';
+        }
+
+        async function saveProfileChanges() {
+            const updates = {
+                age: parseInt(document.getElementById('profileAge').value) || null,
+                gender: document.getElementById('profileGender').value,
+                bloodGroup: document.getElementById('profileBloodGroup').value,
+                height: document.getElementById('profileHeight').value,
+                weight: document.getElementById('profileWeight').value,
+                address: document.getElementById('profileAddress').value,
+                diseases: document.getElementById('profileDiseases').value.split('\\n').filter(d => d.trim()),
+                allergies: document.getElementById('profileAllergies').value.split('\\n').filter(a => a.trim()),
+                emergencyContactName: document.getElementById('profileEmergencyName').value,
+                emergencyContactNumber: document.getElementById('profileEmergencyPhone').value
+            };
+
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch('http://localhost:5000/api/auth/updateProfile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.token}`
+                    },
+                    body: JSON.stringify(updates)
+                });
+
+                if (response.ok) {
+                    alert('Profile updated successfully');
+                    editProfileMode(false);
+                } else {
+                    alert('Failed to update profile');
+                }
+            } catch (err) {
+                console.error('Error saving profile:', err);
+                alert('Error saving changes');
+            }
+        }
+
+        function showReminders() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'reminders') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'reminders';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-bell me-2"></i>My Reminders</h2>
+                    <button class="btn btn-success" onclick="showCreateReminderModal()">
+                        <i class="fas fa-plus me-1"></i>Add Reminder
+                    </button>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div id="remindersList" class="row gy-3"></div>
+                    </div>
+                </div>
+            `;
+
+            loadReminders();
+        }
+
+        async function loadReminders() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch('http://localhost:5000/api/reminders', {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const reminders = await response.json();
+
+                const container = document.getElementById('remindersList');
+                if (!Array.isArray(reminders) || reminders.length === 0) {
+                    container.innerHTML = `<div class="col-12"><div class="alert alert-info">No reminders set. Create one to get started!</div></div>`;
+                    return;
+                }
+
+                container.innerHTML = reminders.map(reminder => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title">${reminder.title}</h6>
+                                    <span class="badge ${reminder.isActive ? 'bg-success' : 'bg-secondary'}">${reminder.isActive ? 'Active' : 'Inactive'}</span>
+                                </div>
+                                <p class="card-text small">${reminder.description || ''}</p>
+                                <p class="mb-2"><small><strong>Frequency:</strong> ${reminder.frequency}</small></p>
+                                <p class="mb-2"><small><strong>Time:</strong> ${reminder.time}</small></p>
+                                <p class="text-muted small"><i class="fas fa-calendar me-1"></i>From ${new Date(reminder.startDate).toLocaleDateString()}</p>
+                                <button class="btn btn-sm btn-danger" onclick="deleteReminder('${reminder._id}')">
+                                    <i class="fas fa-trash me-1"></i>Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Error loading reminders:', err);
+                document.getElementById('remindersList').innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load reminders.</div></div>`;
+            }
+        }
+
+        function showCreateReminderModal() {
+            const modalHtml = `
+                <div class="modal fade" id="createReminderModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Create Reminder</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="reminderForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">Reminder Type *</label>
+                                        <select id="reminderType" class="form-select" required>
+                                            <option value="medication">Medication</option>
+                                            <option value="appointment">Appointment</option>
+                                            <option value="checkup">Checkup</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Title *</label>
+                                        <input type="text" id="reminderTitle" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Description</label>
+                                        <textarea id="reminderDescription" class="form-control" rows="2"></textarea>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Frequency *</label>
+                                            <select id="reminderFrequency" class="form-select" required>
+                                                <option value="daily">Daily</option>
+                                                <option value="weekly">Weekly</option>
+                                                <option value="monthly">Monthly</option>
+                                                <option value="once">Once</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Time *</label>
+                                            <input type="time" id="reminderTime" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Start Date *</label>
+                                        <input type="date" id="reminderStartDate" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">End Date</label>
+                                        <input type="date" id="reminderEndDate" class="form-control">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-success" onclick="createReminder()">Create Reminder</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            new bootstrap.Modal(document.getElementById('createReminderModal')).show();
+            document.getElementById('createReminderModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        async function createReminder() {
+            const reminder = {
+                type: document.getElementById('reminderType').value,
+                title: document.getElementById('reminderTitle').value,
+                description: document.getElementById('reminderDescription').value,
+                frequency: document.getElementById('reminderFrequency').value,
+                time: document.getElementById('reminderTime').value,
+                startDate: document.getElementById('reminderStartDate').value,
+                endDate: document.getElementById('reminderEndDate').value
+            };
+
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch('http://localhost:5000/api/reminders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.token}`
+                    },
+                    body: JSON.stringify(reminder)
+                });
+
+                if (response.ok) {
+                    alert('Reminder created successfully');
+                    bootstrap.Modal.getInstance(document.getElementById('createReminderModal')).hide();
+                    loadReminders();
+                } else {
+                    alert('Failed to create reminder');
+                }
+            } catch (err) {
+                console.error('Error creating reminder:', err);
+                alert('Error creating reminder');
+            }
+        }
+
+        async function deleteReminder(reminderId) {
+            if (!confirm('Delete this reminder?')) return;
+
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch(`http://localhost:5000/api/reminders/${reminderId}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+
+                if (response.ok) {
+                    alert('Reminder deleted');
+                    loadReminders();
+                }
+            } catch (err) {
+                console.error('Error deleting reminder:', err);
+                alert('Error deleting reminder');
+            }
+        }
+
+        async function showAppointments() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'appointments') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'appointments';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-check me-2"></i>My Appointments</h2>
+                </div>
+
+                <div id="appointmentsList" class="row gy-3"></div>
+            `;
+
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch(`http://localhost:5000/api/appointments/patient/${user._id}`, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const appointments = await response.json();
+
+                const listContainer = document.getElementById('appointmentsList');
+                if (!Array.isArray(appointments) || appointments.length === 0) {
+                    listContainer.innerHTML = `<div class="col-12"><div class="alert alert-info">No appointments found.</div></div>`;
+                    return;
+                }
+
+                listContainer.innerHTML = appointments.map(appt => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">${appt.date} at ${appt.time}</h6>
+                                <p class="card-text"><strong>Doctor:</strong> ${appt.doctor?.name || 'Not assigned'}</p>
+                                <p class="card-text small"><strong>Status:</strong> <span class="badge bg-${appt.status === 'confirmed' ? 'success' : appt.status === 'completed' ? 'info' : 'warning'}">${appt.status}</span></p>
+                                <p class="card-text small">${appt.notes || ''}</p>
+                                <button class="btn btn-sm btn-primary" onclick="viewAppointmentDetails('${appt._id}')">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Error loading appointments:', err);
+                document.getElementById('appointmentsList').innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load appointments.</div></div>`;
+            }
+        }
+
+        async function viewAppointmentDetails(appointmentId) {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch(`http://localhost:5000/api/appointments/${appointmentId}`, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+
+                if (!response.ok) {
+                    alert('Failed to load appointment details');
+                    return;
+                }
+
+                const appt = await response.json();
+
+                const modalHtml = `
+                    <div class="modal fade" id="appointmentDetailsModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Appointment Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <p><strong>Date & Time:</strong> ${appt.date} at ${appt.time}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Status:</strong> <span class="badge bg-${appt.status === 'confirmed' ? 'success' : appt.status === 'completed' ? 'info' : 'warning'}">${appt.status}</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <p><strong>Doctor:</strong> ${appt.doctor?.name || 'Not assigned'}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Specialization:</strong> ${appt.doctor?.specialization || 'N/A'}</p>
+                                        </div>
+                                    </div>
+                                    ${appt.notes ? `<p><strong>Notes:</strong> ${appt.notes}</p>` : ''}
+                                    ${appt.consultationFee ? `<p><strong>Consultation Fee:</strong> $${appt.consultationFee}</p>` : ''}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                new bootstrap.Modal(document.getElementById('appointmentDetailsModal')).show();
+                document.getElementById('appointmentDetailsModal').addEventListener('hidden.bs.modal', function() {
+                    this.remove();
+                });
+            } catch (err) {
+                console.error('Error loading appointment:', err);
+                alert('Error loading appointment details');
+            }
+        }
+
+        function checkAuth() {
+            const user = localStorage.getItem("user");
+            if (!user) {
+                alert("Please login first");
+                window.location = "index.html";
+            }
+        }
+
+        function loadUserDashboard() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (user) {
+                if (document.getElementById("userName")) {
+                    document.getElementById("userName").innerText = user.name || "User";
+                }
+            }
+        }
+
+        function updateDashboardStats() {
+            // Get user data and update stats
+            const user = JSON.parse(localStorage.getItem('user')) || {};
+            // Medical reports count from user.reports array
+            const reportsCount = (user.reports && Array.isArray(user.reports)) ? user.reports.length : 0;
+            if (document.getElementById('reportsCount')) {
+                document.getElementById('reportsCount').textContent = reportsCount;
+            }
+        }
+
+        function setCurrentDate() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent =
+                now.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            document.getElementById('lastLogin').textContent =
+                now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showDoctors() {
+            alert('Doctor search functionality coming soon');
         }
     </script>
 </body>

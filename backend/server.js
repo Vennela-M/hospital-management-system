@@ -162,6 +162,10 @@ const authRoutes = require("./routes/auth");
 app.use("/api/auth", authRoutes);
 app.use("/api/patients", require("./routes/patientRoutes"));
 app.use("/api/appointments", require("./routes/appointmentRoutes"));
+app.use("/api/prescriptions", require("./routes/prescriptionRoutes"));
+app.use("/api/reminders", require("./routes/reminderRoutes"));
+app.use("/api/reports", require("./routes/reportRoutes"));
+app.use("/api/alerts", require("./routes/outbreakAlertRoutes"));
 app.use("/api/doctors", require("./routes/doctor"));
 app.use("/api/users", require("./routes/user"));
 

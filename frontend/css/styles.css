@@ -48,6 +48,8 @@ footer {
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow);
+  position: relative;
+  z-index: 9999 !important;
 }
 
 .navbar-brand {
@@ -65,6 +67,28 @@ footer {
 .navbar-nav .nav-link:hover {
   color: var(--primary-color) !important;
   transform: translateY(-1px);
+}
+
+
+.navbar-nav .dropdown-menu::before {
+  content: '';
+  top: -8px;
+  right: 20px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid white;
+}
+
+.dropdown-item {
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+  color: var(--primary-color) !important;
 }
 
 /* Cards */

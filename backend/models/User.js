@@ -33,18 +33,20 @@ const userSchema = new mongoose.Schema({
   // 🔹 DOCTOR INFO (only if doctor)
   specialization: { type: String, default: "" },
   hospital: { type: String, default: "" },
+  consultationFee: { type: Number, default: 0 },
+  slotsAvailable: { type: Number, default: 0 },
 
   // 🔹 PERSONAL DETAILS
   age: { type: Number, default: null },
   gender: { type: String, default: "" },
   bloodGroup: { type: String, default: "" },
-  height: { type: String, default: "" },
-  weight: { type: String, default: "" },
+  height: { type: String, default: "" },  // e.g., "5'10\""
+  weight: { type: String, default: "" },  // e.g., "75 kg"
   address: { type: String, default: "" },
 
   // 🔹 MEDICAL DETAILS
-  diseases: { type: String, default: "" },       // chronic diseases
-  allergies: { type: String, default: "" },
+  diseases: [{ type: String }],  // chronic diseases - array
+  allergies: [{ type: String }],  // allergies - array
   medications: { type: String, default: "" },
   surgeries: { type: String, default: "" },
   conditions: { type: String, default: "" },    // extra notes if needed
@@ -58,6 +60,10 @@ const userSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
+
+  // 🔹 REMINDERS & PRESCRIPTIONS
+  reminders: [{ type: mongoose.Schema.Types.ObjectId, ref: "Reminder" }],
+  prescriptions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Prescription" }],
 
   availability: {
     type: Object,

@@ -114,6 +114,30 @@ router.get("/patient/:patientId", auth, async (req, res) => {
 });
 
 
+// ✅ GET SINGLE APPOINTMENT BY ID
+router.get("/:id", auth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id)
+      .populate("patient", "name email phone age")
+      .populate("doctor", "name specialization email phone")
+      .populate("prescription");
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Allow patient, doctor, or admin to view
+    if (req.user.role === "user" && req.user._id.toString() !== appointment.patient._id.toString()) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    res.json(appointment);
+  } catch (err) {
+    console.error("GET APPOINTMENT ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ✅ UPDATE STATUS (IMPORTANT FEATURE 🔥)
 router.put("/:id", auth, requireRole(["admin", "doctor"]), async (req, res) => {
   try {

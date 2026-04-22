@@ -116,7 +116,7 @@
 
             <div class="row g-4 justify-content-center">
                 <!-- Patient Box -->
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="role-box patient">
                         <i class="fas fa-user-injured role-icon"></i>
                         <h3>Patient</h3>
@@ -127,8 +127,20 @@
                     </div>
                 </div>
 
+                <!-- Doctor Box -->
+                <div class="col-md-4">
+                    <div class="role-box doctor">
+                        <i class="fas fa-user-md role-icon"></i>
+                        <h3>Doctor</h3>
+                        <p>Access your schedule, patient appointments, and availability settings</p>
+                        <button class="btn" onclick="selectRoleAndLogin('doctor')">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login as Doctor
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Admin Box -->
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="role-box admin">
                         <i class="fas fa-cog role-icon"></i>
                         <h3>Admin</h3>
@@ -236,12 +248,17 @@
                 title.innerText = 'Admin Login';
                 submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Admin Sign In';
                 if (createLink) createLink.style.display = 'none';
+            } else if (role === 'doctor') {
+                title.innerText = 'Doctor Login';
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Doctor Sign In';
+                if (createLink) createLink.style.display = 'none';
             } else {
                 title.innerText = 'Patient Login';
                 submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Sign In';
                 if (createLink) createLink.style.display = 'block';
             }
         }
+
 
         function togglePassword(event) {
             event.preventDefault();

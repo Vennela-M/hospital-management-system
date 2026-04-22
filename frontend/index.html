@@ -34,14 +34,29 @@
                         <a id="navContact" class="nav-link" href="#contact">Contact</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-globe me-1"></i><span id="languageLabel">EN</span>
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="setLanguage('en')">English</a></li>
-                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="setLanguage('te')">Telugu</a></li>
-                            <li><a class="dropdown-item" href="javascript:void(0)" onclick="setLanguage('hi')">Hindi</a></li>
-                        </ul>
+                        <ul class="dropdown-menu dropdown-menu-end language-dropdown">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center active-lang" href="#" onclick="event.preventDefault(); setLanguage('en')">
+                                    <span class="lang-icon bg-dark text-white">EN</span>
+                                    <span class="ms-2">English</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="#" onclick="event.preventDefault(); setLanguage('te')">
+                                    <span class="lang-icon bg-info text-white">తె</span>
+                                    <span class="ms-2">తెలుగు</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="#" onclick="event.preventDefault(); setLanguage('hi')">
+                                    <span class="lang-icon bg-warning text-dark">हि</span>
+                                    <span class="ms-2">हिंदी</span>
+                                </a>
+                            </li>
+                        </ul>       
                     </li>
                 </ul>
             </div>
@@ -340,29 +355,55 @@
             }
         };
 
-        function setLanguage(lang) {
+        function setLanguage(lang, closeDropdown = true) {
             const selected = translations[lang] ? lang : 'en';
             const text = translations[selected];
 
-            document.getElementById('navFeatures').innerText = text.navFeatures;
-            document.getElementById('navAbout').innerText = text.navAbout;
-            document.getElementById('navContact').innerText = text.navContact;
-            document.getElementById('languageLabel').innerText = text.languageLabel;
-            document.getElementById('heroTitle').innerHTML = text.heroTitle;
-            document.getElementById('heroSubtitle').innerText = text.heroSubtitle;
-            document.getElementById('heroPrimaryText').innerText = text.heroPrimaryText;
-            document.getElementById('heroSecondaryText').innerText = text.heroSecondaryText;
-            document.getElementById('featuresTitle').innerText = text.featuresTitle;
-            document.getElementById('featuresSubtitle').innerText = text.featuresSubtitle;
-            document.getElementById('availabilityTitle').innerText = text.availabilityTitle;
-            document.getElementById('availabilityDescription').innerText = text.availabilityDescription;
-            document.getElementById('aboutTitle').innerText = text.aboutTitle;
-            document.getElementById('aboutPara1').innerText = text.aboutPara1;
-            document.getElementById('aboutPara2').innerText = text.aboutPara2;
-            document.getElementById('contactTitle').innerText = text.contactTitle;
-            document.getElementById('contactDescription').innerText = text.contactDescription;
+            // Update all text elements
+            const elements = {
+                'navFeatures': text.navFeatures,
+                'navAbout': text.navAbout,
+                'navContact': text.navContact,
+                'languageLabel': text.languageLabel,
+                'heroTitle': text.heroTitle,
+                'heroSubtitle': text.heroSubtitle,
+                'heroPrimaryText': text.heroPrimaryText,
+                'heroSecondaryText': text.heroSecondaryText,
+                'featuresTitle': text.featuresTitle,
+                'featuresSubtitle': text.featuresSubtitle,
+                'availabilityTitle': text.availabilityTitle,
+                'availabilityDescription': text.availabilityDescription,
+                'aboutTitle': text.aboutTitle,
+                'aboutPara1': text.aboutPara1,
+                'aboutPara2': text.aboutPara2,
+                'contactTitle': text.contactTitle,
+                'contactDescription': text.contactDescription
+            };
 
+            for (const [id, content] of Object.entries(elements)) {
+                const elem = document.getElementById(id);
+                if (elem) {
+                    if (id === 'heroTitle') {
+                        elem.innerHTML = content;
+                    } else {
+                        elem.innerText = content;
+                    }
+                }
+            }
+
+            // Save language preference
             localStorage.setItem('siteLanguage', selected);
+
+            // Close dropdown if requested
+            if (closeDropdown) {
+                const dropdown = document.getElementById('languageDropdown');
+                if (dropdown && window.bootstrap && window.bootstrap.Dropdown) {
+                    const dropdownInstance = bootstrap.Dropdown.getInstance(dropdown);
+                    if (dropdownInstance) {
+                        dropdownInstance.hide();
+                    }
+                }
+            }
         }
 
         function getSavedLanguage() {
@@ -380,7 +421,11 @@
 
         async function loadHospitalAvailability() {
             try {
-                const response = await fetch("http://localhost:5000/api/hospital/availability");
+                const response = await fetch("http://localhost:5000/api/hospital/availability", {
+                    method: 'GET',
+                    cache: 'no-cache',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -435,6 +480,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadHospitalAvailability();
             setLanguage(getSavedLanguage());
+
+            // Auto-refresh hospital availability every 30 seconds
+            setInterval(loadHospitalAvailability, 30000);
 
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {

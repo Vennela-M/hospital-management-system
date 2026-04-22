@@ -47,7 +47,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 class="h3 mb-1">Admin Dashboard</h1>
-                    <p class="text-muted mb-0">System administration and management</p>
+                    <p class="text-muted mb-0">Doctor, Hospital & Outbreak Alert Management</p>
                 </div>
                 <div class="text-end">
                     <div class="h6 mb-0" id="currentDate"></div>
@@ -58,72 +58,40 @@
 
         <!-- Quick Stats -->
         <div class="row g-3 mb-4">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card text-center">
                     <div class="card-body py-3">
-                        <div class="h4 mb-0 text-primary" id="totalUsers">0</div>
-                        <small class="text-muted">Total Users</small>
+                        <div class="h4 mb-0 text-primary" id="totalDoctors">0</div>
+                        <small class="text-muted">Total Doctors</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card text-center">
                     <div class="card-body py-3">
-                        <div class="h4 mb-0 text-success" id="activeDoctors">0</div>
-                        <small class="text-muted">Active Doctors</small>
+                        <div class="h4 mb-0 text-success" id="totalHospitals">0</div>
+                        <small class="text-muted">Total Hospitals</small>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="card text-center">
                     <div class="card-body py-3">
-                        <div class="h4 mb-0 text-info" id="totalAppointments">0</div>
-                        <small class="text-muted">Total Appointments</small>
+                        <div class="h4 mb-0 text-warning" id="activeAlerts">0</div>
+                        <small class="text-muted">Active Alerts</small>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body py-3">
-                        <div class="h4 mb-0 text-warning" id="systemRevenue">0</div>
-                        <small class="text-muted">Monthly Revenue</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Doctor Login Section -->
-        <div class="card mb-4 border-primary">
-            <div class="card-body text-center">
-                <h5 class="card-title text-primary"><i class="fas fa-user-md me-2"></i>Doctor Login</h5>
-                <p class="card-text">Login as a doctor to access doctor dashboard and manage appointments.</p>
-                <button class="btn btn-primary" onclick="openDoctorLoginModal()">
-                    <i class="fas fa-sign-in-alt me-1"></i>Login as Doctor
-                </button>
             </div>
         </div>
 
         <!-- Dashboard Cards -->
         <div class="dashboard-grid">
-            <div class="dashboard-card" onclick="showUserManagement()">
-                <div class="dashboard-card-icon text-primary">
-                    <i class="fas fa-users-cog"></i>
-                </div>
-                <h3>User Management</h3>
-                <p>Manage users, doctors, and administrators</p>
-                <div class="mt-auto">
-                    <small class="text-muted">
-                        <i class="fas fa-arrow-right me-1"></i>Manage users
-                    </small>
-                </div>
-            </div>
-
             <div class="dashboard-card" onclick="showDoctorManagement()">
-                <div class="dashboard-card-icon text-info">
+                <div class="dashboard-card-icon text-primary">
                     <i class="fas fa-user-md"></i>
                 </div>
                 <h3>Doctor Management</h3>
-                <p>Create and manage doctor accounts</p>
+                <p>Create, edit, and manage doctors</p>
                 <div class="mt-auto">
                     <small class="text-muted">
                         <i class="fas fa-arrow-right me-1"></i>Manage doctors
@@ -136,36 +104,23 @@
                     <i class="fas fa-building"></i>
                 </div>
                 <h3>Hospital Management</h3>
-                <p>Configure hospital settings and departments</p>
+                <p>View and manage hospital information</p>
                 <div class="mt-auto">
                     <small class="text-muted">
-                        <i class="fas fa-arrow-right me-1"></i>Manage hospital
+                        <i class="fas fa-arrow-right me-1"></i>Manage hospitals
                     </small>
                 </div>
             </div>
 
-            <div class="dashboard-card" onclick="showAppointmentManagement()">
-                <div class="dashboard-card-icon text-info">
-                    <i class="fas fa-calendar-alt"></i>
+            <div class="dashboard-card" onclick="showOutbreakAlerts()">
+                <div class="dashboard-card-icon text-danger">
+                    <i class="fas fa-virus"></i>
                 </div>
-                <h3>Appointment Management</h3>
-                <p>Oversee all appointments and scheduling</p>
+                <h3>Outbreak Alerts</h3>
+                <p>Create and manage disease alerts</p>
                 <div class="mt-auto">
                     <small class="text-muted">
-                        <i class="fas fa-arrow-right me-1"></i>Manage appointments
-                    </small>
-                </div>
-            </div>
-
-            <div class="dashboard-card" onclick="showSystemReports()">
-                <div class="dashboard-card-icon text-warning">
-                    <i class="fas fa-chart-bar"></i>
-                </div>
-                <h3>System Reports</h3>
-                <p>View analytics and system performance</p>
-                <div class="mt-auto">
-                    <small class="text-muted">
-                        <i class="fas fa-arrow-right me-1"></i>View reports
+                        <i class="fas fa-arrow-right me-1"></i>Manage alerts
                     </small>
                 </div>
             </div>
@@ -197,14 +152,18 @@
             setCurrentDate();
         });
 
+        function checkAuth() {
+            const user = localStorage.getItem("user");
+            if (!user) {
+                alert("Please login first");
+                window.location = "login.html";
+            }
+        }
+
         function loadAdminDashboard() {
             const user = JSON.parse(localStorage.getItem("user"));
             if (user) {
-                if (document.getElementById("adminName")) {
-                    // Remove "Loading..." state and display actual name
-                    document.getElementById("adminName").innerText = (user.name || "Admin");
-                }
-                // Verify admin role
+                document.getElementById("adminName").innerText = (user.name || "Admin");
                 if (user.role !== 'admin') {
                     window.location = 'index.html';
                 }
@@ -220,15 +179,6 @@
             }
         }
 
-        function updateDashboardStats() {
-            // This would normally fetch from API
-            // For now, just set placeholders
-            document.getElementById('totalUsers').textContent = '1,247';
-            document.getElementById('activeDoctors').textContent = '23';
-            document.getElementById('totalAppointments').textContent = '3,456';
-            document.getElementById('systemRevenue').textContent = '$45,230';
-        }
-
         function setCurrentDate() {
             const now = new Date();
             document.getElementById('currentDate').textContent =
@@ -240,7 +190,36 @@
                 });
         }
 
-        // ========== DOCTOR MANAGEMENT ==========
+        async function updateDashboardStats() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+
+                // Get doctor count
+                const doctorsRes = await fetch('http://localhost:5000/api/doctors', {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const doctors = await doctorsRes.json();
+                document.getElementById('totalDoctors').textContent = Array.isArray(doctors) ? doctors.length : 0;
+
+                // Get hospital count
+                const hospitalsRes = await fetch('http://localhost:5000/api/admin/hospitals', {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const hospitals = await hospitalsRes.json();
+                document.getElementById('totalHospitals').textContent = Array.isArray(hospitals) ? hospitals.length : 0;
+
+                // Get active alerts count
+                const alertsRes = await fetch('http://localhost:5000/api/alerts', {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const alerts = await alertsRes.json();
+                document.getElementById('activeAlerts').textContent = Array.isArray(alerts) ? alerts.length : 0;
+            } catch (err) {
+                console.error('Error updating stats:', err);
+            }
+        }
+
+        // ==================== DOCTOR MANAGEMENT ====================
         function showDoctorManagement() {
             const container = document.getElementById("mainContent");
 
@@ -260,7 +239,6 @@
                     </button>
                 </div>
 
-                <!-- Create Doctor Form (Hidden by default) -->
                 <div id="createDoctorFormContainer" style="display: none; margin-bottom: 30px;">
                     <div class="card border-success">
                         <div class="card-header bg-success text-white">
@@ -293,11 +271,24 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Specialization *</label>
-                                        <input type="text" class="form-control" id="doctorSpecialization" placeholder="e.g., Cardiology, Neurology" required>
+                                        <input type="text" class="form-control" id="doctorSpecialization" placeholder="e.g., Cardiology" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Consultation Fee *</label>
+                                        <input type="number" class="form-control" id="doctorConsultationFee" placeholder="e.g., 500" required>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Available Slots *</label>
+                                        <input type="number" class="form-control" id="doctorSlots" placeholder="e.g., 20" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Hospital *</label>
-                                        <input type="text" class="form-control" id="doctorHospital" placeholder="e.g., Apollo Hospital" required>
+                                        <select class="form-select" id="doctorHospital" required>
+                                            <option value="">Select hospital</option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -316,14 +307,13 @@
                     </div>
                 </div>
 
-                <!-- Doctors List -->
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">Active Doctors</h5>
                     </div>
                     <div class="card-body">
                         <div id="doctorsListContainer">
-                            <div class="text-center">
+                            <div class="text-center py-5">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
@@ -334,8 +324,30 @@
                 </div>
             `;
 
-            // Load existing doctors
             loadDoctorsList();
+            loadHospitalsForDropdown();
+        }
+
+        async function loadHospitalsForDropdown() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch('http://localhost:5000/api/admin/hospitals', {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const hospitals = await response.json();
+
+                const select = document.getElementById('doctorHospital');
+                if (select && Array.isArray(hospitals)) {
+                    hospitals.forEach(hospital => {
+                        const option = document.createElement('option');
+                        option.value = hospital._id || hospital.name;
+                        option.textContent = hospital.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (err) {
+                console.error('Error loading hospitals:', err);
+            }
         }
 
         function showCreateDoctorForm() {
@@ -350,7 +362,6 @@
             const formContainer = document.getElementById("createDoctorFormContainer");
             if (formContainer) {
                 formContainer.style.display = 'none';
-                // Reset form
                 document.querySelector('form').reset();
                 const message = document.getElementById("doctorCreateMessage");
                 if (message) message.style.display = 'none';
@@ -365,10 +376,12 @@
             const phone = document.getElementById("doctorPhone").value;
             const password = document.getElementById("doctorPassword").value;
             const specialization = document.getElementById("doctorSpecialization").value;
+            const consultationFee = document.getElementById("doctorConsultationFee").value;
+            const slotsAvailable = document.getElementById("doctorSlots").value;
             const hospital = document.getElementById("doctorHospital").value;
             const user = JSON.parse(localStorage.getItem("user"));
 
-            if (!name || !email || !phone || !password || !specialization || !hospital) {
+            if (!name || !email || !phone || !password || !specialization || !consultationFee || !slotsAvailable || !hospital) {
                 alert("All fields are required");
                 return;
             }
@@ -390,6 +403,8 @@
                         phone,
                         password,
                         specialization,
+                        consultationFee: parseInt(consultationFee),
+                        slotsAvailable: parseInt(slotsAvailable),
                         hospital
                     })
                 });
@@ -407,12 +422,10 @@
                     `;
                     messageDiv.style.display = 'block';
 
-                    // Reset form
                     document.querySelector('form').reset();
-
-                    // Reload doctors list
                     setTimeout(() => {
                         loadDoctorsList();
+                        updateDashboardStats();
                     }, 2000);
                 } else {
                     throw new Error(data.message);
@@ -432,9 +445,7 @@
             const user = JSON.parse(localStorage.getItem("user"));
             try {
                 const response = await fetch("http://localhost:5000/api/doctors", {
-                    headers: {
-                        "Authorization": `Bearer ${user.token}`
-                    }
+                    headers: { Authorization: `Bearer ${user.token}` }
                 });
 
                 const doctors = await response.json();
@@ -445,10 +456,10 @@
                     return;
                 }
 
-                if (!doctors.length) {
+                if (!doctors || !doctors.length) {
                     container.innerHTML = `
                         <div class="alert alert-info">
-                            No doctors found in database
+                            <i class="fas fa-info-circle me-2"></i>No doctors found. Create one to get started.
                         </div>
                     `;
                     return;
@@ -464,24 +475,22 @@
                                     <th>Email</th>
                                     <th>Phone</th>
                                     <th>Specialization</th>
+                                    <th>Fee</th>
+                                    <th>Slots</th>
                                     <th>Hospital</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 ${doctors.map(doc => `
                                     <tr>
-                                        <td>${doc.doctorId || doc._id}</td>
+                                        <td><small>${doc.doctorId || doc._id.substring(0, 8)}</small></td>
                                         <td>${doc.name}</td>
                                         <td>${doc.email}</td>
                                         <td>${doc.phone}</td>
-                                        <td>${doc.specialization}</td>
-                                        <td>${doc.hospital}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" onclick="alert('Doctor management and profile editing coming soon')">
-                                                View
-                                            </button>
-                                        </td>
+                                        <td>${doc.specialization || '-'}</td>
+                                        <td>₹${doc.consultationFee || '-'}</td>
+                                        <td>${doc.slotsAvailable || '-'}</td>
+                                        <td>${doc.hospital || '-'}</td>
                                     </tr>
                                 `).join("")}
                             </tbody>
@@ -497,541 +506,8 @@
             }
         }
 
-
-        function showUserManagement() {
-            const container = document.getElementById("mainContent");
-
-            if (container.style.display === 'block' && container.dataset.currentSection === 'user-management') {
-                container.style.display = 'none';
-                return;
-            }
-
-            container.dataset.currentSection = 'user-management';
-            container.style.display = 'block';
-
-            container.innerHTML = `
-                <div class="section-header">
-                    <h2><i class="fas fa-users-cog me-2"></i>User Management</h2>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn btn-success" onclick="addNewUser()">
-                            <i class="fas fa-plus me-1"></i>Add User
-                        </button>
-                        <div class="input-group" style="max-width: 360px;">
-                            <input type="text" class="form-control" id="searchPatientRef" placeholder="Search by Patient Ref ID...">
-                            <button class="btn btn-primary" onclick="searchPatientByRef()">
-                                <i class="fas fa-search me-1"></i>Search
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="userSearchResult" class="mb-4"></div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Patients List</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="usersListContainer" class="table-responsive">
-                            <div class="text-center py-5 text-muted">
-                                <i class="fas fa-sync-alt fa-spin me-2"></i>Loading patients...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            loadAdminUsers();
-        }
-
-        async function loadAdminUsers() {
-            try {
-                const user = JSON.parse(localStorage.getItem("user"));
-                const response = await fetch("http://localhost:5000/api/patients", {
-                    headers: { Authorization: `Bearer ${user.token}` }
-                });
-                const patients = await response.json();
-                displayUsers(patients);
-            } catch (err) {
-                console.error("Error loading users:", err);
-                document.getElementById("usersListContainer").innerHTML = `<div class="alert alert-danger">Unable to load patients.</div>`;
-            }
-        }
-
-        async function searchPatientByRef() {
-            const patientId = document.getElementById("searchPatientRef").value.trim();
-            if (!patientId) {
-                alert("Please enter a Patient Reference ID");
-                return;
-            }
-            const user = JSON.parse(localStorage.getItem("user"));
-            try {
-                const response = await fetch(`http://localhost:5000/api/admin/patient/${patientId}`, {
-                    headers: { Authorization: `Bearer ${user.token}` }
-                });
-                const patient = await response.json();
-                if (response.ok) {
-                    displayPatientDetails(patient);
-                } else {
-                    document.getElementById("userSearchResult").innerHTML = `<div class="alert alert-danger">${patient.message}</div>`;
-                }
-            } catch (err) {
-                console.error("Error:", err);
-                document.getElementById("userSearchResult").innerHTML = `<div class="alert alert-danger">Network error</div>`;
-            }
-        }
-
-        function displayPatientDetails(patient) {
-            const container = document.getElementById("userSearchResult");
-            container.innerHTML = `
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Patient Details - ${patient.patientId}</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6"><strong>Name:</strong> ${patient.name}</div>
-                            <div class="col-md-6"><strong>Email:</strong> ${patient.email}</div>
-                            <div class="col-md-6"><strong>Phone:</strong> ${patient.phone}</div>
-                            <div class="col-md-6"><strong>Age:</strong> ${patient.age || 'N/A'}</div>
-                            <div class="col-md-6"><strong>Gender:</strong> ${patient.gender || 'N/A'}</div>
-                            <div class="col-md-6"><strong>Blood Group:</strong> ${patient.bloodGroup || 'N/A'}</div>
-                            <div class="col-md-12"><strong>Address:</strong> ${patient.address || 'N/A'}</div>
-                        </div>
-                        <hr>
-                        <h6>Medical History</h6>
-                        <div id="patientAppointments">${patient.name}'s appointments loading...</div>
-                        <div class="mt-3">
-                            <button class="btn btn-success" onclick="assignDoctor('${patient._id}')">Assign Doctor</button>
-                            <button class="btn btn-warning" onclick="markPayment('${patient._id}')">Mark Payment</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            loadPatientAppointments(patient._id);
-        }
-
-        async function loadPatientAppointments(patientId) {
-            const user = JSON.parse(localStorage.getItem("user"));
-            try {
-                const response = await fetch(`http://localhost:5000/api/appointments/patient/${patientId}`, {
-                    headers: { Authorization: `Bearer ${user.token}` }
-                });
-                const appointments = await response.json();
-                const container = document.getElementById("patientAppointments");
-                if (!appointments.length) {
-                    container.innerHTML = "No appointments found.";
-                    return;
-                }
-                container.innerHTML = appointments.map(appt => `
-                    <div class="border p-2 mb-2">
-                        <strong>${appt.date} ${appt.time}</strong> - ${appt.status} - Payment: ${appt.paymentStatus}
-                        <br>Doctor: ${appt.doctor?.name || 'Not assigned'} | Notes: ${appt.notes}
-                        <div class="mt-2">
-                            ${appt.status === 'pending' || appt.status === 'hold' ? `<button class="btn btn-sm btn-success me-1" onclick="assignDoctor('${appt._id}')">Assign Doctor</button>` : ''}
-                            ${appt.paymentStatus === 'unpaid' ? `<button class="btn btn-sm btn-warning" onclick="markPayment('${appt._id}')">Mark Paid</button>` : ''}
-                        </div>
-                    </div>
-                `).join("");
-            } catch (err) {
-                console.error("Error:", err);
-                document.getElementById("patientAppointments").innerHTML = "Error loading appointments.";
-            }
-        }
-
-        async function assignDoctor(appointmentId) {
-            const doctorId = prompt("Enter Doctor ID to assign:");
-            if (!doctorId) return;
-            const user = JSON.parse(localStorage.getItem("user"));
-            try {
-                const response = await fetch(`http://localhost:5000/api/admin/appointment/${appointmentId}/assign`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${user.token}`
-                    },
-                    body: JSON.stringify({ doctorId })
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    alert("Doctor assigned successfully");
-                    // Refresh
-                    searchPatientByRef();
-                } else {
-                    alert(data.message);
-                }
-            } catch (err) {
-                console.error("Error:", err);
-                alert("Network error");
-            }
-        }
-
-        async function markPayment(appointmentId) {
-            const user = JSON.parse(localStorage.getItem("user"));
-            try {
-                const response = await fetch(`http://localhost:5000/api/admin/appointment/${appointmentId}/pay`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${user.token}`
-                    }
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    alert("Payment marked as paid");
-                    // Refresh
-                    searchPatientByRef();
-                } else {
-                    alert(data.message);
-                }
-            } catch (err) {
-                console.error("Error:", err);
-                alert("Network error");
-            }
-        }
-
-        function displayUsers(users) {
-            const container = document.getElementById("usersListContainer");
-            if (!users || !users.length) {
-                container.innerHTML = `
-                    <div class="text-center py-5 text-muted">
-                        <i class="fas fa-users fa-2x mb-3"></i>
-                        <div>No patients created yet.</div>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = `
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Patient Ref</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Joined</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${users.map(patient => `
-                            <tr>
-                                <td>${patient.patientId || '-'}</td>
-                                <td>${patient.name || '-'}</td>
-                                <td>${patient.email || '-'}</td>
-                                <td>${patient.phone || '-'}</td>
-                                <td>${new Date(patient.createdAt).toLocaleDateString()}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="openPatientActionModal('${patient._id}')">
-                                        <i class="fas fa-eye me-1"></i>Manage
-                                    </button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
-        async function searchPatientByRef() {
-            const ref = document.getElementById("searchPatientRef").value.trim();
-            const resultContainer = document.getElementById("userSearchResult");
-            resultContainer.innerHTML = "";
-
-            if (!ref) {
-                alert("Enter a patient reference ID to search.");
-                return;
-            }
-
-            try {
-                const user = JSON.parse(localStorage.getItem("user"));
-                const response = await fetch(`http://localhost:5000/api/patients/search/${encodeURIComponent(ref)}`, {
-                    headers: { Authorization: `Bearer ${user.token}` }
-                });
-
-                if (!response.ok) {
-                    const data = await response.json();
-                    resultContainer.innerHTML = `<div class="alert alert-warning">${data.message || 'Patient not found.'}</div>`;
-                    return;
-                }
-
-                const { patient, appointments } = await response.json();
-
-                resultContainer.innerHTML = `
-                    <div class="card border-info mb-3">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <h5 class="card-title mb-1">${patient.name}</h5>
-                                    <p class="mb-1"><strong>Reference ID:</strong> ${patient.patientId}</p>
-                                    <p class="mb-0"><strong>Email:</strong> ${patient.email || 'N/A'}</p>
-                                    <p class="mb-0"><strong>Phone:</strong> ${patient.phone || 'N/A'}</p>
-                                </div>
-                                <button class="btn btn-success" onclick="openPatientActionModal('${patient._id}')">
-                                    <i class="fas fa-hand-holding-medical me-1"></i>Assign Doctor / Payment
-                                </button>
-                            </div>
-                            <div>
-                                <h6 class="mb-2">Appointments</h6>
-                                ${appointments && appointments.length ? `
-                                    <ul class="list-group list-group-flush">
-                                        ${appointments.map(app => `
-                                            <li class="list-group-item">
-                                                <strong>${app.date} ${app.time}</strong> - ${app.status}
-                                                <div><small>${app.doctor ? app.doctor.name : 'No doctor assigned'}</small></div>
-                                            </li>
-                                        `).join('')}
-                                    </ul>
-                                ` : `<p class="text-muted mb-0">No appointments found for this patient.</p>`}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } catch (err) {
-                console.error("Search failed:", err);
-                resultContainer.innerHTML = `<div class="alert alert-danger">Unable to search patient now.</div>`;
-            }
-        }
-
-        function addNewUser() {
-            const modalHtml = `
-                <div class="modal fade" id="addPatientModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Add New Patient</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="addPatientForm">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Full Name *</label>
-                                            <input type="text" class="form-control" id="patientName" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="patientEmail">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Phone</label>
-                                            <input type="text" class="form-control" id="patientPhone">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Age</label>
-                                            <input type="number" class="form-control" id="patientAge">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Gender</label>
-                                            <select class="form-select" id="patientGender">
-                                                <option value="">Select</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                                <option value="Other">Other</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Address</label>
-                                            <input type="text" class="form-control" id="patientAddress">
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-success" onclick="createPatient()">Create Patient</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            const modal = new bootstrap.Modal(document.getElementById('addPatientModal'));
-            modal.show();
-            document.getElementById('addPatientModal').addEventListener('hidden.bs.modal', function() {
-                this.remove();
-            });
-        }
-
-        async function createPatient() {
-            const name = document.getElementById('patientName').value.trim();
-            const email = document.getElementById('patientEmail').value.trim();
-            const phone = document.getElementById('patientPhone').value.trim();
-            const age = parseInt(document.getElementById('patientAge').value, 10) || null;
-            const gender = document.getElementById('patientGender').value;
-            const address = document.getElementById('patientAddress').value.trim();
-
-            if (!name) {
-                alert('Name is required.');
-                return;
-            }
-
-            try {
-                const admin = JSON.parse(localStorage.getItem('user'));
-                const response = await fetch('http://localhost:5000/api/patients', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${admin.token}`
-                    },
-                    body: JSON.stringify({ name, email, phone, age, gender, address })
-                });
-
-                if (!response.ok) {
-                    const data = await response.json();
-                    alert(data.message || 'Unable to create patient');
-                    return;
-                }
-
-                alert('Patient created successfully');
-                bootstrap.Modal.getInstance(document.getElementById('addPatientModal')).hide();
-                loadAdminUsers();
-            } catch (err) {
-                console.error('Create patient error:', err);
-                alert('Server error while creating patient');
-            }
-        }
-
-        async function openPatientActionModal(patientId) {
-            try {
-                const admin = JSON.parse(localStorage.getItem('user'));
-                const patientRes = await fetch(`http://localhost:5000/api/patients/${patientId}`, {
-                    headers: { Authorization: `Bearer ${admin.token}` }
-                });
-                const patient = await patientRes.json();
-
-                const doctorsRes = await fetch('http://localhost:5000/api/admin/doctors', {
-                    headers: { Authorization: `Bearer ${admin.token}` }
-                });
-                const doctors = await doctorsRes.json();
-
-                const appointmentsRes = await fetch(`http://localhost:5000/api/appointments/patient/${patientId}`, {
-                    headers: { Authorization: `Bearer ${admin.token}` }
-                });
-                const appointments = await appointmentsRes.json();
-
-                const modalHtml = `
-                    <div class="modal fade" id="patientActionModal" tabindex="-1">
-                        <div class="modal-dialog modal-xl">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Patient Management: ${patient.name || 'Unknown'}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="row gy-3">
-                                        <div class="col-lg-6">
-                                            <div class="card mb-3">
-                                                <div class="card-body">
-                                                    <h6>Patient Details</h6>
-                                                    <p><strong>Reference ID:</strong> ${patient.patientId || '-'}</p>
-                                                    <p><strong>Email:</strong> ${patient.email || '-'}</p>
-                                                    <p><strong>Phone:</strong> ${patient.phone || '-'}</p>
-                                                    <p><strong>Age:</strong> ${patient.age || '-'}</p>
-                                                    <p><strong>Gender:</strong> ${patient.gender || '-'}</p>
-                                                    <p><strong>Address:</strong> ${patient.address || '-'}</p>
-                                                </div>
-                                            </div>
-                                            <div class="card mb-3">
-                                                <div class="card-body">
-                                                    <h6>Assign Doctor & Create Payment</h6>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Doctor</label>
-                                                        <select id="billingDoctor" class="form-select">
-                                                            <option value="">Select doctor</option>
-                                                            ${doctors.map(doc => `<option value="${doc._id}">${doc.name} (${doc.specialization || doc.doctorId || 'Doctor'})</option>`).join('')}
-                                                        </select>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Amount</label>
-                                                        <input type="number" id="billingAmount" class="form-control" placeholder="Enter payment amount">
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Notes</label>
-                                                        <textarea id="billingNotes" class="form-control" rows="2" placeholder="Doctor assignment or payment notes"></textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <div class="card mb-3">
-                                                <div class="card-body">
-                                                    <h6>Online Appointment History</h6>
-                                                    ${Array.isArray(appointments) && appointments.length ? `
-                                                        <ul class="list-group">
-                                                            ${appointments.map(app => `
-                                                                <li class="list-group-item">
-                                                                    <strong>${app.date} ${app.time}</strong><br>
-                                                                    Status: <span class="badge bg-${app.status === 'pending' ? 'warning' : app.status === 'confirmed' ? 'success' : 'secondary'}">${app.status}</span><br>
-                                                                    Doctor: ${app.doctor?.name || 'Not assigned'}
-                                                                </li>
-                                                            `).join('')}
-                                                        </ul>
-                                                    ` : `<p class="text-muted mb-0">No appointments found.</p>`}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-success" onclick="createBillingForPatient('${patient._id}')">Create Payment & Assign</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                document.body.insertAdjacentHTML('beforeend', modalHtml);
-                const modal = new bootstrap.Modal(document.getElementById('patientActionModal'));
-                modal.show();
-                document.getElementById('patientActionModal').addEventListener('hidden.bs.modal', function() {
-                    this.remove();
-                });
-            } catch (err) {
-                console.error('Error opening patient action modal:', err);
-                alert('Unable to open patient management modal.');
-            }
-        }
-
-        async function createBillingForPatient(patientId) {
-            const doctor = document.getElementById('billingDoctor').value;
-            const amount = parseFloat(document.getElementById('billingAmount').value);
-            const notes = document.getElementById('billingNotes').value.trim();
-
-            if (!amount || amount <= 0) {
-                alert('Please enter a valid amount.');
-                return;
-            }
-
-            try {
-                const admin = JSON.parse(localStorage.getItem('user'));
-                const response = await fetch('http://localhost:5000/api/billing', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${admin.token}`
-                    },
-                    body: JSON.stringify({ patient: patientId, doctor: doctor || undefined, amount, notes })
-                });
-
-                if (!response.ok) {
-                    const data = await response.json();
-                    alert(data.message || 'Unable to create billing record');
-                    return;
-                }
-
-                alert('Payment record created successfully.');
-                bootstrap.Modal.getInstance(document.getElementById('patientActionModal')).hide();
-            } catch (err) {
-                console.error('Create billing error:', err);
-                alert('Server error while saving payment.');
-            }
-        }
-
-        function addNewHospital() {
+        // ==================== HOSPITAL MANAGEMENT ====================
+        async function showHospitalManagement() {
             const container = document.getElementById("mainContent");
 
             if (container.style.display === 'block' && container.dataset.currentSection === 'hospital-management') {
@@ -1045,17 +521,9 @@
             container.innerHTML = `
                 <div class="section-header">
                     <h2><i class="fas fa-building me-2"></i>Hospital Management</h2>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-primary" onclick="loadHospitals()">
-                            <i class="fas fa-sync me-1"></i>Refresh
-                        </button>
-                        <button class="btn btn-success" onclick="showAddHospitalModal()">
-                            <i class="fas fa-plus me-1"></i>Add Hospital
-                        </button>
-                    </div>
                 </div>
 
-                <div id="hospitalsList" class="row">
+                <div id="hospitalsListContainer" class="row gy-3">
                     <div class="col-12">
                         <div class="text-center py-5">
                             <div class="spinner-border text-primary" role="status">
@@ -1067,995 +535,505 @@
                 </div>
             `;
 
-            loadHospitals();
-        }
-
-        function showAppointmentManagement() {
-            const container = document.getElementById("mainContent");
-
-            if (container.style.display === 'block' && container.dataset.currentSection === 'appointment-management') {
-                container.style.display = 'none';
-                return;
-            }
-
-            container.dataset.currentSection = 'appointment-management';
-            container.style.display = 'block';
-
-            container.innerHTML = `
-                <div class="section-header">
-                    <h2><i class="fas fa-calendar-alt me-2"></i>Appointment Management</h2>
-                    <div class="d-flex gap-2">
-                        <select class="form-select" style="max-width: 200px;">
-                            <option>All Status</option>
-                            <option>Pending</option>
-                            <option>Confirmed</option>
-                            <option>Completed</option>
-                            <option>Cancelled</option>
-                        </select>
-                        <input type="date" class="form-control" style="max-width: 200px;">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-filter me-1"></i>Filter
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">All Appointments</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Patient</th>
-                                        <th>Doctor</th>
-                                        <th>Date & Time</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="appointmentsTableBody">
-                                    <!-- Appointments will be loaded from database here -->
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted">
-                                            <i class="fas fa-sync-alt me-2"></i>Loading appointments...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function showSystemReports() {
-            const container = document.getElementById("mainContent");
-
-            if (container.style.display === 'block' && container.dataset.currentSection === 'system-reports') {
-                container.style.display = 'none';
-                return;
-            }
-
-            container.dataset.currentSection = 'system-reports';
-            container.style.display = 'block';
-
-            container.innerHTML = `
-                <div class="section-header">
-                    <h2><i class="fas fa-chart-bar me-2"></i>System Reports</h2>
-                    <div class="d-flex gap-2">
-                        <select class="form-select" style="max-width: 200px;">
-                            <option>Last 7 days</option>
-                            <option>Last 30 days</option>
-                            <option>Last 3 months</option>
-                            <option>Last year</option>
-                        </select>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-download me-1"></i>Export Report
-                        </button>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">User Registration Trends</h5>
-                            </div>
-                            <div class="card-body">
-                                <canvas id="userChart" width="400" height="200"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Appointment Statistics</h5>
-                            </div>
-                            <div class="card-body">
-                                <canvas id="appointmentChart" width="400" height="200"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Revenue Report</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="revenue-summary">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Total Revenue:</span>
-                                        <strong class="text-success">$45,230</strong>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>This Month:</span>
-                                        <strong>$12,450</strong>
-                                    </div>
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Last Month:</span>
-                                        <strong>$11,890</strong>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <span>Growth:</span>
-                                        <strong class="text-success">+4.7%</strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">System Health</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="system-health">
-                                    <div class="health-item">
-                                        <div class="d-flex justify-content-between mb-2">
-                                            <span>Server Status:</span>
-                                            <span class="badge bg-success">Online</span>
-                                        </div>
-                                        <div class="progress mb-2">
-                                            <div class="progress-bar bg-success" style="width: 98%"></div>
-                                        </div>
-                                        <small class="text-muted">Uptime: 99.8%</small>
-                                    </div>
-
-                                    <div class="health-item mt-3">
-                                        <div class="d-flex justify-content-between mb-2">
-                                            <span>Database:</span>
-                                            <span class="badge bg-success">Healthy</span>
-                                        </div>
-                                        <div class="progress mb-2">
-                                            <div class="progress-bar bg-success" style="width: 95%"></div>
-                                        </div>
-                                        <small class="text-muted">Response time: 45ms</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function addNewUser() {
-            alert('Add new user functionality would open a modal or navigate to user creation page');
-        }
-
-        function addNewHospital() {
-            alert('Add new hospital functionality would open a modal or navigate to hospital creation page');
-        }
-
-        function filterUsers(type) {
-            // This would filter the users table based on type
-            alert('Filtering users by type: ' + type);
-        }
-
-        // HOSPITAL MANAGEMENT FUNCTIONS
-        async function loadHospitals() {
             try {
-                const user = JSON.parse(localStorage.getItem("user"));
-                const response = await fetch("http://localhost:5000/api/hospital", {
-                    headers: {
-                        "Authorization": `Bearer ${user.token}`
-                    }
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch('http://localhost:5000/api/admin/hospitals', {
+                    headers: { Authorization: `Bearer ${user.token}` }
                 });
-
                 const hospitals = await response.json();
-                displayHospitals(hospitals);
-            } catch (error) {
-                console.error("Error loading hospitals:", error);
-                document.getElementById("hospitalsList").innerHTML = `
-                    <div class="col-12">
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            Error loading hospitals. Please try again.
-                        </div>
-                    </div>
-                `;
-            }
-        }
 
-        function displayHospitals(hospitals) {
-            const container = document.getElementById("hospitalsList");
-
-            if (!hospitals || hospitals.length === 0) {
-                container.innerHTML = `
-                    <div class="col-12">
-                        <div class="text-center py-5">
-                            <i class="fas fa-building fa-3x text-muted mb-3"></i>
-                            <h4>No Hospitals Found</h4>
-                            <p class="text-muted">Start by adding your first hospital</p>
-                            <button class="btn btn-primary" onclick="showAddHospitalModal()">
-                                <i class="fas fa-plus me-1"></i>Add First Hospital
-                            </button>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            let html = "";
-            hospitals.forEach(hospital => {
-                const totalBeds = hospital.totalBeds || 0;
-                const availableBeds = hospital.availableBeds || 0;
-                const occupiedBeds = totalBeds - availableBeds;
-                const occupancyRate = totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 0;
-
-                html += `
-                    <div class="col-lg-6 col-xl-4 mb-4">
-                        <div class="card h-100">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">${hospital.name}</h5>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#" onclick="editHospital('${hospital._id}')">
-                                            <i class="fas fa-edit me-2"></i>Edit
-                                        </a></li>
-                                        <li><a class="dropdown-item" href="#" onclick="manageDepartments('${hospital._id}')">
-                                            <i class="fas fa-sitemap me-2"></i>Departments
-                                        </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteHospital('${hospital._id}')">
-                                            <i class="fas fa-trash me-2"></i>Delete
-                                        </a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-12">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <i class="fas fa-map-marker-alt text-muted me-2"></i>
-                                            <small class="text-muted">${hospital.address || 'No address provided'}</small>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-2">
-                                            <i class="fas fa-phone text-muted me-2"></i>
-                                            <small class="text-muted">${hospital.phone || 'No phone provided'}</small>
-                                        </div>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <i class="fas fa-envelope text-muted me-2"></i>
-                                            <small class="text-muted">${hospital.email || 'No email provided'}</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-6">
-                                        <div class="text-center">
-                                            <div class="h4 mb-0 text-primary">${totalBeds}</div>
-                                            <small class="text-muted">Total Beds</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="text-center">
-                                            <div class="h4 mb-0 text-success">${availableBeds}</div>
-                                            <small class="text-muted">Available</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="mb-2">
-                                            <small class="text-muted">Bed Occupancy</small>
-                                            <div class="progress" style="height: 8px;">
-                                                <div class="progress-bar ${occupancyRate > 80 ? 'bg-danger' : occupancyRate > 60 ? 'bg-warning' : 'bg-success'}"
-                                                     style="width: ${occupancyRate}%"></div>
-                                            </div>
-                                            <small class="text-muted">${occupancyRate}% occupied</small>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted">
-                                                <i class="fas fa-user-md me-1"></i>
-                                                ${hospital.doctors ? hospital.doctors.length : 0} Doctors
-                                            </small>
-                                            <small class="text-muted">
-                                                <i class="fas fa-sitemap me-1"></i>
-                                                ${hospital.departments ? hospital.departments.length : 0} Departments
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <button class="btn btn-outline-primary btn-sm me-2" onclick="viewHospitalDetails('${hospital._id}')">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </button>
-                                <button class="btn btn-outline-success btn-sm" onclick="manageDepartments('${hospital._id}')">
-                                    <i class="fas fa-cogs me-1"></i>Manage
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        function showAddHospitalModal() {
-            const modalHtml = `
-                <div class="modal fade" id="addHospitalModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Add New Hospital</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="addHospitalForm">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Hospital Name *</label>
-                                            <input type="text" class="form-control" id="hospitalName" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="hospitalEmail">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Phone</label>
-                                            <input type="tel" class="form-control" id="hospitalPhone">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Website</label>
-                                            <input type="url" class="form-control" id="hospitalWebsite">
-                                        </div>
-                                        <div class="col-12 mb-3">
-                                            <label class="form-label">Address *</label>
-                                            <textarea class="form-control" id="hospitalAddress" rows="3" required></textarea>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Total Beds</label>
-                                            <input type="number" class="form-control" id="totalBeds" min="0">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Available Beds</label>
-                                            <input type="number" class="form-control" id="availableBeds" min="0">
-                                        </div>
-                                        <div class="col-12 mb-3">
-                                            <label class="form-label">Description</label>
-                                            <textarea class="form-control" id="hospitalDescription" rows="2"></textarea>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-primary" onclick="addHospital()">Add Hospital</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            const modal = new bootstrap.Modal(document.getElementById('addHospitalModal'));
-            modal.show();
-
-            // Clean up modal after hiding
-            document.getElementById('addHospitalModal').addEventListener('hidden.bs.modal', function() {
-                this.remove();
-            });
-        }
-
-        async function addHospital() {
-            const name = document.getElementById("hospitalName").value.trim();
-            const address = document.getElementById("hospitalAddress").value.trim();
-
-            if (!name || !address) {
-                alert("Hospital name and address are required!");
-                return;
-            }
-
-            const hospitalData = {
-                name: name,
-                address: address,
-                email: document.getElementById("hospitalEmail").value.trim(),
-                phone: document.getElementById("hospitalPhone").value.trim(),
-                website: document.getElementById("hospitalWebsite").value.trim(),
-                totalBeds: parseInt(document.getElementById("totalBeds").value) || 0,
-                availableBeds: parseInt(document.getElementById("availableBeds").value) || 0,
-                description: document.getElementById("hospitalDescription").value.trim(),
-                departments: []
-            };
-
-            try {
-                const user = JSON.parse(localStorage.getItem("user"));
-                const response = await fetch("http://localhost:5000/api/hospital", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${user.token}`
-                    },
-                    body: JSON.stringify(hospitalData)
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert("Hospital added successfully!");
-                    bootstrap.Modal.getInstance(document.getElementById('addHospitalModal')).hide();
-                    loadHospitals();
-                } else {
-                    alert("Error adding hospital: " + (result.message || result.error));
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Network error. Please try again.");
-            }
-        }
-
-        async function editHospital(hospitalId) {
-            try {
-                const user = JSON.parse(localStorage.getItem("user"));
-                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}`, {
-                    headers: {
-                        "Authorization": `Bearer ${user.token}`
-                    }
-                });
-
-                const hospital = await response.json();
-
-                if (!response.ok) {
-                    alert("Error loading hospital details");
+                const container = document.getElementById('hospitalsListContainer');
+                if (!Array.isArray(hospitals) || hospitals.length === 0) {
+                    container.innerHTML = `<div class="col-12"><div class="alert alert-info">No hospitals found.</div></div>`;
                     return;
                 }
 
-                showEditHospitalModal(hospital);
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Network error. Please try again.");
-            }
-        }
-
-        function showEditHospitalModal(hospital) {
-            const modalHtml = `
-                <div class="modal fade" id="editHospitalModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Edit Hospital</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="editHospitalForm">
-                                    <input type="hidden" id="editHospitalId" value="${hospital._id}">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Hospital Name *</label>
-                                            <input type="text" class="form-control" id="editHospitalName" value="${hospital.name}" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Email</label>
-                                            <input type="email" class="form-control" id="editHospitalEmail" value="${hospital.email || ''}">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Phone</label>
-                                            <input type="tel" class="form-control" id="editHospitalPhone" value="${hospital.phone || ''}">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Website</label>
-                                            <input type="url" class="form-control" id="editHospitalWebsite" value="${hospital.website || ''}">
-                                        </div>
-                                        <div class="col-12 mb-3">
-                                            <label class="form-label">Address *</label>
-                                            <textarea class="form-control" id="editHospitalAddress" rows="3" required>${hospital.address || ''}</textarea>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Total Beds</label>
-                                            <input type="number" class="form-control" id="editTotalBeds" value="${hospital.totalBeds || 0}" min="0">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Available Beds</label>
-                                            <input type="number" class="form-control" id="editAvailableBeds" value="${hospital.availableBeds || 0}" min="0">
-                                        </div>
-                                        <div class="col-12 mb-3">
-                                            <label class="form-label">Description</label>
-                                            <textarea class="form-control" id="editHospitalDescription" rows="2">${hospital.description || ''}</textarea>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-primary" onclick="updateHospital()">Update Hospital</button>
+                container.innerHTML = hospitals.map(hospital => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">${hospital.name}</h6>
+                                <p class="card-text small"><i class="fas fa-map-marker-alt me-1"></i>${hospital.address || 'N/A'}</p>
+                                <p class="card-text small"><i class="fas fa-phone me-1"></i>${hospital.phone || 'N/A'}</p>
+                                <p class="card-text small"><i class="fas fa-envelope me-1"></i>${hospital.email || 'N/A'}</p>
+                                <hr>
+                                <p class="mb-1"><small><strong>Total Beds:</strong> ${hospital.totalBeds || 0}</small></p>
+                                <p class="mb-1"><small><strong>Available Beds:</strong> ${hospital.availableBeds || 0}</small></p>
+                                <p class="mb-2"><small><strong>Departments:</strong> ${hospital.departments ? hospital.departments.join(', ') : 'N/A'}</small></p>
+                                <button class="btn btn-sm btn-primary" onclick="showEditHospitalForm('${hospital._id}')">
+                                    <i class="fas fa-edit me-1"></i>Edit
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
-
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            const modal = new bootstrap.Modal(document.getElementById('editHospitalModal'));
-            modal.show();
-
-            document.getElementById('editHospitalModal').addEventListener('hidden.bs.modal', function() {
-                this.remove();
-            });
+                `).join('');
+            } catch (err) {
+                console.error('Error loading hospitals:', err);
+                const container = document.getElementById('hospitalsListContainer');
+                if (container) {
+                    container.innerHTML = `<div class="col-12"><div class="alert alert-danger">Failed to load hospitals.</div></div>`;
+                }
+            }
         }
 
-        async function updateHospital() {
-            const hospitalId = document.getElementById("editHospitalId").value;
-            const name = document.getElementById("editHospitalName").value.trim();
-            const address = document.getElementById("editHospitalAddress").value.trim();
+        async function showEditHospitalForm(hospitalId) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            
+            try {
+                const response = await fetch(`http://localhost:5000/api/admin/hospitals/${hospitalId}`, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const hospital = await response.json();
 
-            if (!name || !address) {
-                alert("Hospital name and address are required!");
+                const modalHTML = `
+                    <div class="modal fade" id="editHospitalModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title">Edit Hospital - ${hospital.name}</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="editHospitalForm" onsubmit="updateHospital(event, '${hospitalId}')">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Total Beds</label>
+                                                <input type="number" class="form-control" id="editTotalBeds" value="${hospital.totalBeds || 0}" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Available Beds</label>
+                                                <input type="number" class="form-control" id="editAvailableBeds" value="${hospital.availableBeds || 0}" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Phone</label>
+                                                <input type="tel" class="form-control" id="editPhone" value="${hospital.phone || ''}" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="editEmail" value="${hospital.email || ''}" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-12">
+                                                <label class="form-label">Address</label>
+                                                <input type="text" class="form-control" id="editAddress" value="${hospital.address || ''}" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-12">
+                                                <label class="form-label">Departments (comma-separated)</label>
+                                                <input type="text" class="form-control" id="editDepartments" value="${hospital.departments ? hospital.departments.join(', ') : ''}" placeholder="e.g., Cardiology, Orthopedics, Neurology">
+                                            </div>
+                                        </div>
+
+                                        <div class="alert alert-info" id="hospitalUpdateMessage" style="display: none;"></div>
+
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save me-1"></i>Save Changes
+                                            </button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Remove existing modal if any
+                const existingModal = document.getElementById('editHospitalModal');
+                if (existingModal) existingModal.remove();
+
+                // Add modal to page
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('editHospitalModal'));
+                modal.show();
+
+                // Clean up modal on hidden
+                document.getElementById('editHospitalModal').addEventListener('hidden.bs.modal', function() {
+                    this.remove();
+                });
+
+            } catch (err) {
+                console.error('Error loading hospital details:', err);
+                alert('Failed to load hospital details');
+            }
+        }
+
+        async function updateHospital(event, hospitalId) {
+            event.preventDefault();
+
+            const totalBeds = document.getElementById('editTotalBeds').value;
+            const availableBeds = document.getElementById('editAvailableBeds').value;
+            const phone = document.getElementById('editPhone').value;
+            const email = document.getElementById('editEmail').value;
+            const address = document.getElementById('editAddress').value;
+            const departments = document.getElementById('editDepartments').value.split(',').map(d => d.trim()).filter(d => d);
+            
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            if (parseInt(availableBeds) > parseInt(totalBeds)) {
+                alert('Available beds cannot exceed total beds');
                 return;
             }
 
-            const hospitalData = {
-                name: name,
-                address: address,
-                email: document.getElementById("editHospitalEmail").value.trim(),
-                phone: document.getElementById("editHospitalPhone").value.trim(),
-                website: document.getElementById("editHospitalWebsite").value.trim(),
-                totalBeds: parseInt(document.getElementById("editTotalBeds").value) || 0,
-                availableBeds: parseInt(document.getElementById("editAvailableBeds").value) || 0,
-                description: document.getElementById("editHospitalDescription").value.trim()
-            };
-
             try {
-                const user = JSON.parse(localStorage.getItem("user"));
-                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}`, {
-                    method: "PUT",
+                const response = await fetch(`http://localhost:5000/api/admin/hospitals/${hospitalId}`, {
+                    method: 'PUT',
                     headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${user.token}`
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.token}`
                     },
-                    body: JSON.stringify(hospitalData)
+                    body: JSON.stringify({
+                        totalBeds: parseInt(totalBeds),
+                        availableBeds: parseInt(availableBeds),
+                        phone,
+                        email,
+                        address,
+                        departments
+                    })
                 });
 
-                const result = await response.json();
+                const data = await response.json();
 
                 if (response.ok) {
-                    alert("Hospital updated successfully!");
-                    bootstrap.Modal.getInstance(document.getElementById('editHospitalModal')).hide();
-                    loadHospitals();
+                    const messageDiv = document.getElementById('hospitalUpdateMessage');
+                    messageDiv.className = 'alert alert-success';
+                    messageDiv.innerHTML = '<i class="fas fa-check-circle me-2"></i>Hospital updated successfully!';
+                    messageDiv.style.display = 'block';
+
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(document.getElementById('editHospitalModal')).hide();
+                        showHospitalManagement();
+                        updateDashboardStats();
+                    }, 1500);
                 } else {
-                    alert("Error updating hospital: " + (result.message || result.error));
+                    throw new Error(data.message || 'Failed to update hospital');
                 }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Network error. Please try again.");
+            } catch (err) {
+                const messageDiv = document.getElementById('hospitalUpdateMessage');
+                messageDiv.className = 'alert alert-danger';
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${err.message}`;
+                messageDiv.style.display = 'block';
             }
         }
 
-        async function deleteHospital(hospitalId) {
-            if (!confirm("Are you sure you want to delete this hospital? This action cannot be undone.")) {
+        // ==================== OUTBREAK ALERTS MANAGEMENT ====================
+        async function showOutbreakAlerts() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'outbreak-alerts') {
+                container.style.display = 'none';
                 return;
             }
 
-            try {
-                const user = JSON.parse(localStorage.getItem("user"));
-                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${user.token}`
-                    }
-                });
-
-                if (response.ok) {
-                    alert("Hospital deleted successfully!");
-                    loadHospitals();
-                } else {
-                    const result = await response.json();
-                    alert("Error deleting hospital: " + (result.message || result.error));
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Network error. Please try again.");
-            }
-        }
-
-        function viewHospitalDetails(hospitalId) {
-            // This would show detailed hospital information
-            alert("Hospital details view would be implemented here");
-        }
-
-        function manageDepartments(hospitalId) {
-            showDepartmentManagement(hospitalId);
-        }
-
-        function showDepartmentManagement(hospitalId) {
-            const container = document.getElementById("mainContent");
+            container.dataset.currentSection = 'outbreak-alerts';
+            container.style.display = 'block';
 
             container.innerHTML = `
                 <div class="section-header">
-                    <h2><i class="fas fa-sitemap me-2"></i>Department Management</h2>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-secondary" onclick="showHospitalManagement()">
-                            <i class="fas fa-arrow-left me-1"></i>Back to Hospitals
-                        </button>
-                        <button class="btn btn-success" onclick="showAddDepartmentModal('${hospitalId}')">
-                            <i class="fas fa-plus me-1"></i>Add Department
-                        </button>
-                    </div>
+                    <h2><i class="fas fa-virus me-2"></i>Outbreak Alerts Management</h2>
+                    <button class="btn btn-danger" onclick="showCreateAlertForm()">
+                        <i class="fas fa-plus me-1"></i>Create New Alert
+                    </button>
                 </div>
 
-                <div id="departmentsList" class="row">
-                    <div class="col-12">
-                        <div class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-2">Loading departments...</p>
+                <div id="createAlertFormContainer" style="display: none; margin-bottom: 30px;">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0">Create Outbreak Alert</h5>
                         </div>
-                    </div>
-                </div>
-            `;
-
-            loadDepartments(hospitalId);
-        }
-
-        async function loadDepartments(hospitalId) {
-            try {
-                const user = JSON.parse(localStorage.getItem("user"));
-                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}`, {
-                    headers: {
-                        "Authorization": `Bearer ${user.token}`
-                    }
-                });
-
-                const hospital = await response.json();
-
-                if (response.ok) {
-                    displayDepartments(hospital, hospitalId);
-                } else {
-                    document.getElementById("departmentsList").innerHTML = `
-                        <div class="col-12">
-                            <div class="alert alert-danger">
-                                Error loading departments. Please try again.
-                            </div>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error("Error loading departments:", error);
-                document.getElementById("departmentsList").innerHTML = `
-                    <div class="col-12">
-                        <div class="alert alert-danger">
-                            Error loading departments. Please try again.
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function displayDepartments(hospital, hospitalId) {
-            const container = document.getElementById("departmentsList");
-            const departments = hospital.departments || [];
-
-            if (departments.length === 0) {
-                container.innerHTML = `
-                    <div class="col-12">
-                        <div class="text-center py-5">
-                            <i class="fas fa-sitemap fa-3x text-muted mb-3"></i>
-                            <h4>No Departments Found</h4>
-                            <p class="text-muted">Start by adding departments to this hospital</p>
-                            <button class="btn btn-primary" onclick="showAddDepartmentModal('${hospitalId}')">
-                                <i class="fas fa-plus me-1"></i>Add First Department
-                            </button>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            let html = "";
-            departments.forEach((dept, index) => {
-                const statusBadge = dept.status === 'active' ? 'bg-success' : 'bg-secondary';
-                const statusText = dept.status === 'active' ? 'Active' : 'Inactive';
-
-                html += `
-                    <div class="col-lg-6 col-xl-4 mb-4">
-                        <div class="card h-100">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">${dept.name}</h5>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#" onclick="editDepartment('${hospitalId}', ${index})">
-                                            <i class="fas fa-edit me-2"></i>Edit
-                                        </a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteDepartment('${hospitalId}', ${index})">
-                                            <i class="fas fa-trash me-2"></i>Delete
-                                        </a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-6">
-                                        <div class="text-center">
-                                            <div class="h4 mb-0 text-primary">${dept.doctorsCount || 0}</div>
-                                            <small class="text-muted">Doctors</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="text-center">
-                                            <div class="h4 mb-0 text-info">${dept.bedsCount || 0}</div>
-                                            <small class="text-muted">Beds</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <div class="d-flex justify-content-center">
-                                            <span class="badge ${statusBadge}">${statusText}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        function showAddDepartmentModal(hospitalId) {
-            const modalHtml = `
-                <div class="modal fade" id="addDepartmentModal" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Add Department</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form id="addDepartmentForm">
-                                    <input type="hidden" id="deptHospitalId" value="${hospitalId}">
-                                    <div class="mb-3">
-                                        <label class="form-label">Department Name *</label>
-                                        <input type="text" class="form-control" id="departmentName" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Number of Doctors</label>
-                                        <input type="number" class="form-control" id="doctorsCount" min="0" value="0">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Number of Beds</label>
-                                        <input type="number" class="form-control" id="bedsCount" min="0" value="0">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Status</label>
-                                        <select class="form-control" id="departmentStatus">
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
+                        <div class="card-body">
+                            <form onsubmit="createOutbreakAlert(event)">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Hospital *</label>
+                                        <select class="form-select" id="alertHospital" required>
+                                            <option value="">Select hospital</option>
                                         </select>
                                     </div>
-                                </form>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Disease Name *</label>
+                                        <input type="text" class="form-control" id="alertDisease" placeholder="e.g., COVID-19" required>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Title *</label>
+                                        <input type="text" class="form-control" id="alertTitle" placeholder="Alert title" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Severity *</label>
+                                        <select class="form-select" id="alertSeverity" required>
+                                            <option value="">Select severity</option>
+                                            <option value="low">Low</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="high">High</option>
+                                            <option value="critical">Critical</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Description *</label>
+                                        <textarea class="form-control" id="alertDescription" rows="3" placeholder="Alert description" required></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Affected Areas *</label>
+                                        <input type="text" class="form-control" id="alertAreas" placeholder="e.g., Downtown, North Zone" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Precautions *</label>
+                                        <textarea class="form-control" id="alertPrecautions" rows="2" placeholder="Safety measures" required></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Start Date *</label>
+                                        <input type="date" class="form-control" id="alertStartDate" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">End Date</label>
+                                        <input type="date" class="form-control" id="alertEndDate">
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info" id="alertCreateMessage" style="display: none;"></div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-danger" id="createAlertBtn">
+                                        <i class="fas fa-check me-1"></i>Create Alert
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideAlertForm()">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="alertsListContainer" class="row gy-3">
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-danger" role="status">
+                                <span class="visually-hidden">Loading...</span>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-primary" onclick="addDepartment()">Add Department</button>
-                            </div>
+                            <p class="mt-2">Loading alerts...</p>
                         </div>
                     </div>
                 </div>
             `;
 
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            const modal = new bootstrap.Modal(document.getElementById('addDepartmentModal'));
-            modal.show();
-
-            document.getElementById('addDepartmentModal').addEventListener('hidden.bs.modal', function() {
-                this.remove();
-            });
+            loadOutbreakAlerts();
+            loadHospitalsForAlertDropdown();
         }
 
-        async function addDepartment() {
-            const hospitalId = document.getElementById("deptHospitalId").value;
-            const name = document.getElementById("departmentName").value.trim();
+        async function loadHospitalsForAlertDropdown() {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch('http://localhost:5000/api/admin/hospitals', {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const hospitals = await response.json();
 
-            if (!name) {
-                alert("Department name is required!");
+                const select = document.getElementById('alertHospital');
+                if (select && Array.isArray(hospitals)) {
+                    hospitals.forEach(hospital => {
+                        const option = document.createElement('option');
+                        option.value = hospital._id;
+                        option.textContent = hospital.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (err) {
+                console.error('Error loading hospitals for alert:', err);
+            }
+        }
+
+        function showCreateAlertForm() {
+            const formContainer = document.getElementById("createAlertFormContainer");
+            if (formContainer) {
+                formContainer.style.display = 'block';
+                document.getElementById("alertTitle").focus();
+            }
+        }
+
+        function hideAlertForm() {
+            const formContainer = document.getElementById("createAlertFormContainer");
+            if (formContainer) {
+                formContainer.style.display = 'none';
+                document.querySelectorAll('form')[document.querySelectorAll('form').length - 1].reset();
+                const message = document.getElementById("alertCreateMessage");
+                if (message) message.style.display = 'none';
+            }
+        }
+
+        async function createOutbreakAlert(event) {
+            event.preventDefault();
+
+            const hospital = document.getElementById("alertHospital").value;
+            const title = document.getElementById("alertTitle").value;
+            const description = document.getElementById("alertDescription").value;
+            const severity = document.getElementById("alertSeverity").value;
+            const diseaseName = document.getElementById("alertDisease").value;
+            const affectedAreas = document.getElementById("alertAreas").value;
+            const precautions = document.getElementById("alertPrecautions").value;
+            const startDate = document.getElementById("alertStartDate").value;
+            const endDate = document.getElementById("alertEndDate").value;
+            const user = JSON.parse(localStorage.getItem("user"));
+
+            if (!hospital || !title || !description || !severity || !diseaseName || !affectedAreas || !precautions || !startDate) {
+                alert("All required fields must be filled");
                 return;
             }
 
-            const departmentData = {
-                name: name,
-                doctorsCount: parseInt(document.getElementById("doctorsCount").value) || 0,
-                bedsCount: parseInt(document.getElementById("bedsCount").value) || 0,
-                status: document.getElementById("departmentStatus").value
-            };
+            const btn = document.getElementById("createAlertBtn");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
 
             try {
-                const user = JSON.parse(localStorage.getItem("user"));
-                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}/departments`, {
+                const response = await fetch("http://localhost:5000/api/alerts", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${user.token}`
                     },
-                    body: JSON.stringify(departmentData)
+                    body: JSON.stringify({
+                        hospital,
+                        title,
+                        description,
+                        severity,
+                        diseaseName,
+                        affectedAreas,
+                        precautions,
+                        startDate,
+                        endDate: endDate || null
+                    })
                 });
 
-                const result = await response.json();
+                const data = await response.json();
 
                 if (response.ok) {
-                    alert("Department added successfully!");
-                    bootstrap.Modal.getInstance(document.getElementById('addDepartmentModal')).hide();
-                    loadDepartments(hospitalId);
+                    const messageDiv = document.getElementById("alertCreateMessage");
+                    messageDiv.className = "alert alert-success";
+                    messageDiv.innerHTML = `
+                        <i class="fas fa-check-circle me-2"></i>
+                        Alert created successfully!
+                    `;
+                    messageDiv.style.display = 'block';
+
+                    document.querySelectorAll('form')[document.querySelectorAll('form').length - 1].reset();
+                    setTimeout(() => {
+                        loadOutbreakAlerts();
+                        updateDashboardStats();
+                    }, 2000);
                 } else {
-                    alert("Error adding department: " + (result.message || result.error));
+                    throw new Error(data.message || 'Failed to create alert');
                 }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Network error. Please try again.");
+            } catch (err) {
+                const messageDiv = document.getElementById("alertCreateMessage");
+                messageDiv.className = "alert alert-danger";
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${err.message}`;
+                messageDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>Create Alert';
             }
         }
 
-        async function deleteDepartment(hospitalId, deptIndex) {
-            if (!confirm("Are you sure you want to delete this department?")) {
-                return;
+        async function loadOutbreakAlerts() {
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const response = await fetch("http://localhost:5000/api/alerts", {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+
+                const alerts = await response.json();
+                const container = document.getElementById("alertsListContainer");
+
+                if (!response.ok) {
+                    container.innerHTML = `<div class="col-12"><div class="alert alert-danger">${alerts.message || 'Unable to load alerts.'}</div></div>`;
+                    return;
+                }
+
+                if (!alerts || !alerts.length) {
+                    container.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>No outbreak alerts. Create one to notify users.
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = alerts.map(alert => `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card border-danger h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0">${alert.title}</h6>
+                                    <span class="badge bg-${alert.severity === 'critical' ? 'danger' : alert.severity === 'high' ? 'warning' : 'info'}">${alert.severity.toUpperCase()}</span>
+                                </div>
+                                <p class="card-text small mb-2"><strong>${alert.diseaseName}</strong></p>
+                                <p class="card-text small mb-2">${alert.description}</p>
+                                <p class="card-text small mb-2"><i class="fas fa-map-marker-alt me-1"></i>${alert.affectedAreas}</p>
+                                <p class="card-text small mb-2"><strong>Precautions:</strong> ${alert.precautions}</p>
+                                <p class="text-muted small"><i class="fas fa-calendar me-1"></i>${new Date(alert.startDate).toLocaleDateString()}</p>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deactivateAlert('${alert._id}')">
+                                    <i class="fas fa-times me-1"></i>Deactivate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error("Error loading alerts:", err);
+                const container = document.getElementById("alertsListContainer");
+                if (container) {
+                    container.innerHTML = `<div class="col-12"><div class="alert alert-danger">Network error loading alerts.</div></div>`;
+                }
             }
+        }
+
+        async function deactivateAlert(alertId) {
+            if (!confirm('Deactivate this alert?')) return;
 
             try {
                 const user = JSON.parse(localStorage.getItem("user"));
-                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}/departments/${deptIndex}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${user.token}`
-                    }
+                const response = await fetch(`http://localhost:5000/api/alerts/${alertId}/deactivate`, {
+                    method: "PUT",
+                    headers: { Authorization: `Bearer ${user.token}` }
                 });
 
                 if (response.ok) {
-                    alert("Department deleted successfully!");
-                    loadDepartments(hospitalId);
+                    alert('Alert deactivated');
+                    loadOutbreakAlerts();
+                    updateDashboardStats();
                 } else {
-                    const result = await response.json();
-                    alert("Error deleting department: " + (result.message || result.error));
+                    alert('Failed to deactivate alert');
                 }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Network error. Please try again.");
-            }
-        }
-
-        async function loadDoctorsForLogin() {
-            const user = JSON.parse(localStorage.getItem("user"));
-            try {
-                const response = await fetch("http://localhost:5000/api/doctors", {
-                    headers: { Authorization: `Bearer ${user.token}` }
-                });
-                const doctors = await response.json();
-                const select = document.getElementById("doctorSelect");
-                select.innerHTML = '<option value="">Select a doctor</option>';
-                doctors.forEach(doc => {
-                    select.innerHTML += `<option value="${doc._id}">${doc.name} - ${doc.specialization}</option>`;
-                });
             } catch (err) {
-                console.error("Error loading doctors:", err);
-            }
-        }
-
-        function openDoctorLoginModal(){
-
-            // Load doctors for dropdown
-            loadDoctorsForLogin();
-            const modal =
-            new bootstrap.Modal(
-            document.getElementById("doctorLoginModal")
-            );
-            modal.show();
-            }
-            async function loginDoctorFromAdmin(){
-            const doctorId =
-            document.getElementById("doctorSelect").value;
-            const password =
-            document.getElementById("doctorPassword").value;
-            const admin =
-            JSON.parse(localStorage.getItem("user"));
-            if(!admin){
-                alert("Admin session expired");
-                return;
-            }
-            if(!doctorId){
-                alert("Please select a doctor");
-                return;
-            }
-            try{
-
-            const res = await fetch(
-                "http://localhost:5000/api/auth/admin/doctor-login",
-                {
-                    method:"POST",
-                    headers:{
-                    "Content-Type":"application/json",
-                    Authorization:`Bearer ${admin.token}`
-             },
-                body:JSON.stringify({
-                doctorId,
-                password
-                })
-                }
-            );
-            const data = await res.json();
-            if(res.ok){
-                const doctorSession = {
-                    ...data.doctor,
-                    token: data.token
-                };
-                localStorage.setItem("user", JSON.stringify(doctorSession));
-                window.location = "doctor.html";
-            } else {
-            alert(data.message || "Doctor login failed");
-            }
-            } catch(err){
-            console.error(err);
-            alert("Server error");
+                console.error('Error:', err);
+                alert('Error deactivating alert');
             }
         }
     </script>
-    <div class="modal fade" id="doctorLoginModal" tabindex="-1">
-        <div class="modal-dialog">
-        <div class="modal-content">
-
-        <div class="modal-header">
-        <h5 class="modal-title">Doctor Login</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-
-        <div class="modal-body">
-
-        <div class="mb-3">
-        <label>Doctor</label>
-        <select id="doctorSelect" class="form-control" required>
-            <option value="">Loading doctors...</option>
-        </select>
-        </div>
-
-        <div class="mb-3">
-        <label>Password</label>
-        <input type="password"
-        id="doctorPassword"
-        class="form-control"
-        placeholder="Enter doctor password">
-        </div>
-
-        <button class="btn btn-primary w-100"
-        onclick="loginDoctorFromAdmin()">
-        Login to Dashboard
-        </button>
-        </div>
-        </div>
-        </div>
-        </div>
 </body>
+
 </html>
