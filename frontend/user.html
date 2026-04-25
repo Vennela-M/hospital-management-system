@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - AroVyuha</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-hospital text-primary me-2"></i>
+                <span class="fw-bold">AroVyuha</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-user-circle me-1"></i>
+                            Welcome, <span id="userName" class="fw-bold"></span>
+                        </span>
+                    </li>
+                    <li class="nav-item me-2">
+                        <button class="btn btn-outline-secondary btn-sm position-relative" onclick="toggleAlertsPanel()" title="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span id="alertNavBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  style="display:none;font-size:0.65rem;">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Banner Stack - Auto-displayed on all dashboards -->
+    <div id="alertBannerStack"></div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">Patient Dashboard</h1>
+                    <p class="text-muted mb-0">Manage your healthcare journey</p>
+                </div>
+                <div class="text-end">
+                    <div class="h6 mb-0" id="currentDate"></div>
+                    <small class="text-muted">Last login: <span id="lastLogin"></span></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts panel (bell history dropdown) -->
+        <div id="alertsPanel" style="display:none;" class="mb-3">
+            <div class="card border-warning shadow-sm">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center py-2">
+                    <span class="fw-semibold"><i class="fas fa-bell me-2"></i>Notifications</span>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-dark" onclick="dismissAllAlerts()">
+                            <i class="fas fa-check-double me-1"></i>Mark all read
+                        </button>
+                        <button class="btn btn-sm btn-outline-dark" onclick="toggleAlertsPanel()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-2" id="alertsContainer"></div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-primary" id="totalAppointments">0</div>
+                        <small class="text-muted">Total Appointments</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-success" id="upcomingAppointments">0</div>
+                        <small class="text-muted">Upcoming</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-info" id="completedAppointments">0</div>
+                        <small class="text-muted">Completed</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-warning" id="reportsCount">0</div>
+                        <small class="text-muted">Medical Reports</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card" onclick="showAppointments()">
+                <div class="dashboard-card-icon text-primary">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Appointments</h3>
+                <p>Book, view, and manage your appointments</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Click to manage
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showDoctors()">
+                <div class="dashboard-card-icon text-success">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h3>Find Doctors</h3>
+                <p>Search and connect with healthcare professionals</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Find specialists
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showProfile()">
+                <div class="dashboard-card-icon text-info">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <h3>My Profile</h3>
+                <p>Update personal and medical information</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Manage details
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showMedicalRecords()">
+                <div class="dashboard-card-icon text-warning">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <h3>Medical Records</h3>
+                <p>Access your complete health history</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>View records
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div id="mainContent" class="content-section" style="display: none;">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3 mt-5">
+        <div class="container text-center">
+            <small>&copy; 2024 AroVyuha. All rights reserved.</small>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+
+    <div class="modal fade" id="doctorAvailabilityModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="doctorAvailabilityTitle">Doctor Availability</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Choose date</label>
+                        <input type="date" id="availabilityDate" class="form-control" onchange="refreshAvailability()" />
+                    </div>
+                    <div id="availabilitySlots" class="row g-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="doctorAvailabilityModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="doctorAvailabilityTitle">Doctor Availability</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="availabilityDetails" class="mb-3"></div>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <label for="availabilityDate" class="form-label mb-0">Choose date</label>
+                        <input type="date" id="availabilityDate" class="form-control w-auto" onchange="refreshAvailability()">
+                    </div>
+                    <div id="availabilitySlots" class="row g-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="doctorChatModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="doctorChatTitle">Ask a Doctor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Your question</label>
+                        <textarea id="doctorQuestionText" class="form-control" rows="4" placeholder="Type your quick question here..."></textarea>
+                    </div>
+                    <button class="btn btn-primary w-100" onclick="submitDoctorQuestion()">Send Question</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadUserDashboard();
+            updateDashboardStats();
+            setCurrentDate();
+            startAlertPolling(30000);
+        });
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                window.location = 'index.html';
+            }
+        }
+
+        async function updateDashboardStats() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) return;
+            try {
+                const res  = await fetch('http://localhost:5000/api/medical-reports', {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const json = await res.json();
+                const total = json.data?.pagination?.total ?? (json.data?.reports?.length ?? 0);
+                const el = document.getElementById('reportsCount');
+                if (el) el.textContent = total;
+            } catch (err) {
+                console.error('updateDashboardStats error:', err);
+            }
+        }
+
+        function setCurrentDate() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent =
+                now.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            document.getElementById('lastLogin').textContent =
+                now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function showMedicalRecords() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'medical-records') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'medical-records';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header d-flex justify-content-between align-items-center mb-3">
+                    <h2><i class="fas fa-file-medical me-2"></i>Medical Records</h2>
+                    <button class="btn btn-primary" onclick="showUploadReportForm()">
+                        <i class="fas fa-upload me-1"></i>Upload Report
+                    </button>
+                </div>
+
+                <!-- Upload form (hidden by default) -->
+                <div id="uploadReportForm" style="display:none;" class="mb-4">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-upload me-2"></i>Upload Medical Report</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Report Title *</label>
+                                    <input type="text" class="form-control" id="reportTitle" placeholder="e.g. Blood Test Results">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Report Date</label>
+                                    <input type="date" class="form-control" id="reportDate">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Description <small class="text-muted">(optional)</small></label>
+                                    <textarea class="form-control" id="reportDescription" rows="2"
+                                              placeholder="Brief description of the report..."></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Attach File <small class="text-muted">(PDF, JPG, PNG — max 5 MB)</small></label>
+                                    <input type="file" class="form-control" id="reportFile"
+                                           accept=".pdf,.jpg,.jpeg,.png" onchange="previewReportFile()">
+                                    <div id="filePreview" class="mt-2"></div>
+                                </div>
+                            </div>
+                            <div id="uploadReportMsg" class="mt-3"></div>
+                            <div class="mt-3 d-flex gap-2">
+                                <button class="btn btn-success" onclick="uploadReport()">
+                                    <i class="fas fa-save me-1"></i>Save Report
+                                </button>
+                                <button class="btn btn-secondary" onclick="hideUploadReportForm()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports list -->
+                <div id="reportsList">
+                    <div class="text-center py-4"><div class="spinner-border text-warning"></div></div>
+                </div>
+            `;
+
+            // Set today as default date
+            const today = new Date().toISOString().slice(0, 10);
+            const dateEl = document.getElementById('reportDate');
+            if (dateEl) dateEl.value = today;
+
+            loadMedicalReports();
+        }
+
+        function showUploadReportForm() {
+            document.getElementById('uploadReportForm').style.display = 'block';
+            document.getElementById('reportTitle').focus();
+        }
+
+        function hideUploadReportForm() {
+            document.getElementById('uploadReportForm').style.display = 'none';
+            document.getElementById('reportTitle').value = '';
+            document.getElementById('reportDescription').value = '';
+            document.getElementById('reportFile').value = '';
+            document.getElementById('filePreview').innerHTML = '';
+            const msg = document.getElementById('uploadReportMsg');
+            if (msg) msg.innerHTML = '';
+        }
+
+        function previewReportFile() {
+            const file    = document.getElementById('reportFile').files[0];
+            const preview = document.getElementById('filePreview');
+            if (!file) { preview.innerHTML = ''; return; }
+
+            if (file.size > 5 * 1024 * 1024) {
+                preview.innerHTML = `<div class="alert alert-warning py-2">File is too large (max 5 MB).</div>`;
+                document.getElementById('reportFile').value = '';
+                return;
+            }
+
+            const icon = file.type === 'application/pdf'
+                ? '<i class="fas fa-file-pdf text-danger me-2"></i>'
+                : '<i class="fas fa-file-image text-info me-2"></i>';
+            preview.innerHTML = `<div class="alert alert-info py-2">${icon}<strong>${file.name}</strong> (${(file.size/1024).toFixed(1)} KB) — ready to upload</div>`;
+        }
+
+        async function uploadReport() {
+            const user    = JSON.parse(localStorage.getItem('user'));
+            const msgEl   = document.getElementById('uploadReportMsg');
+            const title   = document.getElementById('reportTitle').value.trim();
+            const desc    = document.getElementById('reportDescription').value.trim();
+            const dateVal = document.getElementById('reportDate').value;
+            const fileEl  = document.getElementById('reportFile');
+            const file    = fileEl.files[0];
+
+            if (!title) { alert('Report title is required.'); return; }
+            if (!desc && !file) { alert('Please add a description or attach a file.'); return; }
+
+            if (msgEl) msgEl.innerHTML = `<div class="alert alert-info"><div class="spinner-border spinner-border-sm me-2"></div>Saving report...</div>`;
+
+            try {
+                let fileData = null, fileName = null, fileType = null;
+
+                if (file) {
+                    // Read file as base64
+                    fileData = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload  = e => resolve(e.target.result); // data:mime;base64,...
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                    fileName = file.name;
+                    fileType = file.type;
+                }
+
+                const body = {
+                    title,
+                    report:   desc || (file ? file.name : ''),
+                    date:     dateVal || new Date().toISOString(),
+                    fileData,
+                    fileName,
+                    fileType,
+                };
+
+                const res  = await fetch('http://localhost:5000/api/medical-reports', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
+                    body:    JSON.stringify(body),
+                });
+                const json = await res.json();
+                console.log('Upload report response:', json);
+
+                if (res.ok) {
+                    if (msgEl) msgEl.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>Report saved successfully!</div>`;
+                    setTimeout(() => {
+                        hideUploadReportForm();
+                        loadMedicalReports();
+                        updateAppointmentStats(); // refresh reports count
+                    }, 1000);
+                } else {
+                    const errMsg = json.errors?.map(e => e.msg).join(', ') || json.message || 'Failed to save report';
+                    if (msgEl) msgEl.innerHTML = `<div class="alert alert-danger">${errMsg}</div>`;
+                }
+            } catch (err) {
+                console.error('uploadReport error:', err);
+                if (msgEl) msgEl.innerHTML = `<div class="alert alert-danger">Network error saving report.</div>`;
+            }
+        }
+
+        async function loadMedicalReports() {
+            const user   = JSON.parse(localStorage.getItem('user'));
+            const listEl = document.getElementById('reportsList');
+            if (!listEl) return;
+
+            try {
+                const res  = await fetch('http://localhost:5000/api/medical-reports', {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const json = await res.json();
+                console.log('Medical reports:', json);
+
+                if (!res.ok) {
+                    listEl.innerHTML = `<div class="alert alert-danger">${json.message || 'Error loading reports'}</div>`;
+                    return;
+                }
+
+                const reports = json.data?.reports || [];
+                const total   = json.data?.pagination?.total || reports.length;
+
+                // Update the stat card
+                const countEl = document.getElementById('reportsCount');
+                if (countEl) countEl.textContent = total;
+
+                if (!reports.length) {
+                    listEl.innerHTML = `
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-file-medical fa-3x mb-3"></i>
+                            <p>No medical reports yet.</p>
+                            <button class="btn btn-primary" onclick="showUploadReportForm()">
+                                <i class="fas fa-upload me-1"></i>Upload Your First Report
+                            </button>
+                        </div>`;
+                    return;
+                }
+
+                listEl.innerHTML = `
+                    <div class="row g-3">
+                        ${reports.map(r => {
+                            const dateStr  = r.date ? new Date(r.date).toLocaleDateString('en-IN') : '—';
+                            const hasFile  = r.fileName || r.fileUrl;
+                            const fileIcon = r.fileType === 'application/pdf'
+                                ? '<i class="fas fa-file-pdf text-danger me-1"></i>'
+                                : (r.fileType?.startsWith('image/') ? '<i class="fas fa-file-image text-info me-1"></i>' : '<i class="fas fa-file me-1"></i>');
+                            return `
+                            <div class="col-md-6">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="card-title mb-0">${r.title}</h5>
+                                            <small class="text-muted">${dateStr}</small>
+                                        </div>
+                                        ${r.report ? `<p class="text-muted small mb-2">${r.report}</p>` : ''}
+                                        ${hasFile ? `
+                                            <div class="d-flex align-items-center gap-2 mt-2">
+                                                ${fileIcon}<span class="small">${r.fileName || 'Attached file'}</span>
+                                                <button class="btn btn-sm btn-outline-primary ms-auto"
+                                                        onclick="downloadReport('${r._id}','${r.fileName || 'report'}')">
+                                                    <i class="fas fa-download me-1"></i>View
+                                                </button>
+                                            </div>` : ''}
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-user me-1"></i>
+                                                Uploaded by: ${r.uploadedBy?.name || 'You'}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                `;
+            } catch (err) {
+                console.error('loadMedicalReports error:', err);
+                if (listEl) listEl.innerHTML = `<div class="alert alert-danger">Error loading reports.</div>`;
+            }
+        }
+
+        async function downloadReport(reportId, fileName) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            try {
+                const res  = await fetch(`http://localhost:5000/api/medical-reports/file/${reportId}`, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const json = await res.json();
+                if (!res.ok) { alert(json.message || 'Could not load file'); return; }
+
+                const { fileData, fileType } = json.data;
+                // Open base64 data in a new tab
+                const win = window.open();
+                if (fileType === 'application/pdf') {
+                    win.document.write(`<iframe src="${fileData}" style="width:100%;height:100vh;border:none;"></iframe>`);
+                } else {
+                    win.document.write(`<img src="${fileData}" style="max-width:100%;">`);
+                }
+            } catch (err) {
+                console.error('downloadReport error:', err);
+                alert('Error loading file.');
+            }
+        }
+    </script>
+</body>
+</html>
+

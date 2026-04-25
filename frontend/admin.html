@@ -1,0 +1,3297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AroVyuha</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-hospital text-primary me-2"></i>
+                <span class="fw-bold">AroVyuha</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <button class="btn btn-outline-secondary btn-sm position-relative me-2" onclick="toggleAlertsPanel()">
+                            <i class="fas fa-bell"></i>
+                            <span id="alertNavBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <span class="navbar-text me-3">
+                            <i class="fas fa-user-shield me-1"></i>
+                            <span id="adminName" class="fw-bold">Loading...</span>
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Banner Stack - Auto-displayed on all dashboards -->
+    <div id="alertBannerStack"></div>
+
+    <!-- Dashboard Container -->
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-1">Admin Dashboard</h1>
+                    <p class="text-muted mb-0">System administration and management</p>
+                </div>
+                <div class="text-end">
+                    <div class="h6 mb-0" id="currentDate"></div>
+                    <small class="text-muted">System Status: <span class="badge bg-success">Online</span></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-primary" id="totalUsers">0</div>
+                        <small class="text-muted">Total Users</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-success" id="activeDoctors">0</div>
+                        <small class="text-muted">Active Doctors</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-info" id="totalAppointments">0</div>
+                        <small class="text-muted">Total Appointments</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body py-3">
+                        <div class="h4 mb-0 text-warning" id="systemRevenue">0</div>
+                        <small class="text-muted">Monthly Revenue</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctor Login Section -->
+        <div class="card mb-4 border-primary">
+            <div class="card-body text-center">
+                <h5 class="card-title text-primary"><i class="fas fa-user-md me-2"></i>Doctor Login</h5>
+                <p class="card-text">Login as a doctor to access doctor dashboard and manage appointments.</p>
+                <button class="btn btn-primary" onclick="openDoctorLoginModal()">
+                    <i class="fas fa-sign-in-alt me-1"></i>Login as Doctor
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-grid">
+            <div class="dashboard-card" onclick="showUserManagement()">
+                <div class="dashboard-card-icon text-primary">
+                    <i class="fas fa-users-cog"></i>
+                </div>
+                <h3>User Management</h3>
+                <p>Manage users, doctors, and administrators</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Manage users
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showDoctorManagement()">
+                <div class="dashboard-card-icon text-info">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h3>Doctor Management</h3>
+                <p>Create and manage doctor accounts</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Manage doctors
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showHospitalManagement()">                <div class="dashboard-card-icon text-success">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3>Hospital Management</h3>
+                <p>Configure hospital settings and departments</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Manage hospital
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showAppointmentManagement()">
+                <div class="dashboard-card-icon text-info">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>Appointment Management</h3>
+                <p>Oversee all appointments and scheduling</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Manage appointments
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showSystemReports()">
+                <div class="dashboard-card-icon text-warning">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3>System Reports</h3>
+                <p>View analytics and system performance</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>View reports
+                    </small>
+                </div>
+            </div>
+
+            <div class="dashboard-card" onclick="showAlertManagement()">
+                <div class="dashboard-card-icon text-danger">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <h3>Send Alerts</h3>
+                <p>Broadcast notifications to patients and doctors</p>
+                <div class="mt-auto">
+                    <small class="text-muted">
+                        <i class="fas fa-arrow-right me-1"></i>Manage alerts
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div id="mainContent" class="content-section" style="display: none;">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3 mt-5">
+        <div class="container text-center">
+            <small>&copy; 2024 AroVyuha. All rights reserved.</small>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadAdminDashboard();
+            updateDashboardStats();
+            setCurrentDate();
+            startAlertPolling(30000);   // poll every 30 seconds for alerts
+        });
+
+        function loadAdminDashboard() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (user) {
+                if (document.getElementById("adminName")) {
+                    // Remove "Loading..." state and display actual name
+                    document.getElementById("adminName").innerText = (user.name || "Admin");
+                }
+                // Verify admin role
+                if (user.role !== 'admin') {
+                    window.location = 'index.html';
+                }
+            } else {
+                window.location = 'login.html';
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('user');
+                window.location = 'index.html';
+            }
+        }
+
+        async function updateDashboardStats() {
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const res = await fetch("http://localhost:5000/api/admin/stats", {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const json = await res.json();
+                if (res.ok && json.success) {
+                    const { totalUsers, totalDoctors, totalHospitals, totalAppointments } = json.data;
+                    document.getElementById('totalUsers').textContent        = totalUsers        ?? '—';
+                    document.getElementById('activeDoctors').textContent     = totalDoctors      ?? '—';
+                    document.getElementById('totalAppointments').textContent = totalAppointments ?? '—';
+                    document.getElementById('systemRevenue').textContent     = totalHospitals    ?? '—';
+                    // Repurpose "Monthly Revenue" label to show hospital count
+                    const revLabel = document.querySelector('[data-stat="revenue"] small, #systemRevenue + small');
+                    // Update the label text if possible
+                    const cards = document.querySelectorAll('.card .card-body');
+                    cards.forEach(card => {
+                        if (card.querySelector('#systemRevenue')) {
+                            const label = card.querySelector('small');
+                            if (label) label.textContent = 'Hospitals';
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error("Stats error:", err);
+            }
+        }
+
+        function setCurrentDate() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent =
+                now.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+        }
+
+        // ========== DOCTOR MANAGEMENT ==========
+        function showDoctorManagement() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'doctor-management') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'doctor-management';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-user-md me-2"></i>Doctor Management</h2>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-success" onclick="showCreateDoctorForm()">
+                            <i class="fas fa-plus me-1"></i>Create Doctor
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="showGenerateCodeForm()">
+                            <i class="fas fa-key me-1"></i>Generate Registration Code
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Create Doctor Form (Hidden by default) -->
+                <div id="createDoctorFormContainer" style="display: none; margin-bottom: 30px;">
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Create New Doctor Account</h5>
+                        </div>
+                        <div class="card-body">
+                            <form onsubmit="createDoctor(event)">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Full Name *</label>
+                                        <input type="text" class="form-control" id="doctorName" placeholder="Enter doctor name" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email *</label>
+                                        <input type="email" class="form-control" id="doctorEmail" placeholder="Enter email address" required>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone</label>
+                                        <input type="tel" class="form-control" id="doctorPhone" placeholder="Enter phone number">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Password *</label>
+                                        <input type="password" class="form-control" id="doctorPassword" placeholder="Min 8 characters" required>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Specialization *</label>
+                                        <input type="text" class="form-control" id="doctorSpecialization" placeholder="e.g., Cardiology, Neurology" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Experience (years) *</label>
+                                        <input type="number" class="form-control" id="doctorExperience" placeholder="e.g., 5" min="0" required>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info" id="doctorCreateMessage" style="display: none;"></div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-success" id="createDoctorBtn">
+                                        <i class="fas fa-check me-1"></i>Create Doctor
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideDoctorForm()">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Code Form (Hidden by default) -->
+                <div id="generateCodeFormContainer" style="display: none; margin-bottom: 30px;">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-key me-2"></i>Generate Doctor Registration Code</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small">Generate a one-time code. Share it with the doctor — they use it to self-register with their own password.</p>
+                            <form onsubmit="generateDoctorCode(event)">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Doctor Name *</label>
+                                        <input type="text" class="form-control" id="codeDoctorName" placeholder="Enter doctor name" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email *</label>
+                                        <input type="email" class="form-control" id="codeDoctorEmail" placeholder="Doctor's email" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Specialization *</label>
+                                        <input type="text" class="form-control" id="codeDoctorSpec" placeholder="e.g., Cardiology" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Experience (years) *</label>
+                                        <input type="number" class="form-control" id="codeDoctorExp" placeholder="e.g., 5" min="0" required>
+                                    </div>
+                                </div>
+                                <div class="alert" id="codeGenerateResult" style="display: none;"></div>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary" id="generateCodeBtn">
+                                        <i class="fas fa-key me-1"></i>Generate Code
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="hideCodeForm()">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Doctors List -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Active Doctors</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="doctorsListContainer">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading doctors...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Load existing doctors
+            loadDoctorsList();
+        }
+
+        function showCreateDoctorForm() {
+            const formContainer = document.getElementById("createDoctorFormContainer");
+            if (formContainer) {
+                formContainer.style.display = 'block';
+                document.getElementById("doctorName").focus();
+            }
+        }
+
+        function hideDoctorForm() {
+            const formContainer = document.getElementById("createDoctorFormContainer");
+            if (formContainer) {
+                formContainer.style.display = 'none';
+                const msg = document.getElementById("doctorCreateMessage");
+                if (msg) msg.style.display = 'none';
+            }
+        }
+
+        function showGenerateCodeForm() {
+            document.getElementById("createDoctorFormContainer").style.display = 'none';
+            document.getElementById("generateCodeFormContainer").style.display = 'block';
+        }
+
+        function hideCodeForm() {
+            const el = document.getElementById("generateCodeFormContainer");
+            if (el) el.style.display = 'none';
+        }
+
+        async function createDoctor(event) {
+            event.preventDefault();
+
+            const name           = document.getElementById("doctorName").value.trim();
+            const email          = document.getElementById("doctorEmail").value.trim();
+            const password       = document.getElementById("doctorPassword").value;
+            const specialization = document.getElementById("doctorSpecialization").value.trim();
+            const experience     = parseInt(document.getElementById("doctorExperience").value, 10);
+            const user           = JSON.parse(localStorage.getItem("user"));
+
+            const btn = document.getElementById("createDoctorBtn");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creating...';
+
+            try {
+                const response = await fetch("http://localhost:5000/api/admin/create-doctor", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user.token}`
+                    },
+                    body: JSON.stringify({ name, email, password, specialization, experience })
+                });
+
+                const data = await response.json();
+                console.log("Create doctor response:", data);
+
+                const messageDiv = document.getElementById("doctorCreateMessage");
+
+                if (response.ok && data.success) {
+                    messageDiv.className = "alert alert-success";
+                    messageDiv.innerHTML = `
+                        <i class="fas fa-check-circle me-2"></i>
+                        Doctor created successfully!<br>
+                        <strong>Name: ${data.data.doctor.name}</strong><br>
+                        <small>Doctor can now login with email: <strong>${data.data.loginEmail}</strong></small>
+                    `;
+                    messageDiv.style.display = 'block';
+                    event.target.reset();
+                    setTimeout(() => loadDoctorsList(), 1500);
+                } else {
+                    messageDiv.className = "alert alert-danger";
+                    messageDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${data.message || 'Failed to create doctor'}`;
+                    messageDiv.style.display = 'block';
+                }
+            } catch (err) {
+                const messageDiv = document.getElementById("doctorCreateMessage");
+                messageDiv.className = "alert alert-danger";
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>Network error: ${err.message}`;
+                messageDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check me-1"></i>Create Doctor';
+            }
+        }
+
+        async function generateDoctorCode(event) {
+            event.preventDefault();
+
+            const name           = document.getElementById("codeDoctorName").value.trim();
+            const email          = document.getElementById("codeDoctorEmail").value.trim();
+            const specialization = document.getElementById("codeDoctorSpec").value.trim();
+            const experience     = parseInt(document.getElementById("codeDoctorExp").value, 10);
+            const user           = JSON.parse(localStorage.getItem("user"));
+
+            const btn = document.getElementById("generateCodeBtn");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
+
+            try {
+                const response = await fetch("http://localhost:5000/api/admin/generate-doctor-code", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user.token}`
+                    },
+                    body: JSON.stringify({ name, email, specialization, experience })
+                });
+
+                const data = await response.json();
+                console.log("Generate code response:", data);
+
+                const resultDiv = document.getElementById("codeGenerateResult");
+
+                if (response.ok && data.success) {
+                    const { code, expiresAt } = data.data;
+                    resultDiv.className = "alert alert-success";
+                    resultDiv.innerHTML = `
+                        <i class="fas fa-key me-2"></i><strong>Registration Code Generated!</strong><br>
+                        <div class="mt-2 p-2 bg-light rounded text-center">
+                            <span style="font-size:1.5rem; font-family:monospace; letter-spacing:4px; font-weight:bold;">${code}</span>
+                        </div>
+                        <small class="d-block mt-2">Share this code with <strong>${name}</strong> (${email}).<br>
+                        They register at: <code>POST /api/admin/register-with-code</code> using this code + their password.<br>
+                        Expires: ${new Date(expiresAt).toLocaleString()}</small>
+                    `;
+                    resultDiv.style.display = 'block';
+                    event.target.reset();
+                } else {
+                    resultDiv.className = "alert alert-danger";
+                    resultDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>${data.message || 'Failed to generate code'}`;
+                    resultDiv.style.display = 'block';
+                }
+            } catch (err) {
+                const resultDiv = document.getElementById("codeGenerateResult");
+                resultDiv.className = "alert alert-danger";
+                resultDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i>Network error: ${err.message}`;
+                resultDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-key me-1"></i>Generate Code';
+            }
+        }
+
+        async function loadDoctorsList() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            try {
+                const response = await fetch("http://localhost:5000/api/admin/doctors", {
+                    headers: {
+                        "Authorization": `Bearer ${user.token}`
+                    }
+                });
+
+                const json = await response.json();
+                const container = document.getElementById("doctorsListContainer");
+
+                if (!response.ok) {
+                    container.innerHTML = `<div class="alert alert-danger">${json.message || 'Unable to load doctors.'}</div>`;
+                    return;
+                }
+
+                // Response: { success, message, data: { doctors: [...] } }
+                const doctors = json.data?.doctors || [];
+
+                if (!doctors.length) {
+                    container.innerHTML = `
+                        <div class="alert alert-info">
+                            No doctors found in database
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Specialization</th>
+                                    <th>Experience</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${doctors.map(doc => `
+                                    <tr>
+                                        <td>${doc.name}</td>
+                                        <td>${doc.user?.email || 'N/A'}</td>
+                                        <td>${doc.specialization}</td>
+                                        <td>${doc.experience} yrs</td>
+                                        <td><span class="badge bg-${doc.user?.isActive ? 'success' : 'secondary'}">${doc.user?.isActive ? 'Active' : 'Inactive'}</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="alert('Doctor: ${doc.name.replace(/^Dr\\.\\s*/i, '')}\\nSpecialization: ${doc.specialization}\\nExperience: ${doc.experience} yrs')">
+                                                View
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join("")}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (err) {
+                console.error("Error loading doctors:", err);
+                const container = document.getElementById("doctorsListContainer");
+                if (container) {
+                    container.innerHTML = `<div class="alert alert-danger">Network error loading doctors.</div>`;
+                }
+            }
+        }
+
+
+        function showUserManagement() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'user-management') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'user-management';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-users-cog me-2"></i>User Management</h2>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-success" onclick="addNewUser()">
+                            <i class="fas fa-plus me-1"></i>Add User
+                        </button>
+                        <div class="input-group" style="max-width: 360px;">
+                            <input type="text" class="form-control" id="searchPatientRef" placeholder="Search by Patient Ref ID...">
+                            <button class="btn btn-primary" onclick="searchPatientByRef()">
+                                <i class="fas fa-search me-1"></i>Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="userSearchResult" class="mb-4"></div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Patients List</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="usersListContainer" class="table-responsive">
+                            <div class="text-center py-5 text-muted">
+                                <i class="fas fa-sync-alt fa-spin me-2"></i>Loading patients...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            loadAdminUsers();
+        }
+
+        async function loadAdminUsers() {
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                // Use admin users endpoint with patient role filter
+                const response = await fetch("http://localhost:5000/api/admin/users?role=patient&limit=100", {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const json = await response.json();
+                console.log("Admin users response:", json);
+                // Response: { success, message, data: { users: [...] } }
+                const patients = json.data?.users || [];
+                displayUsers(patients);
+            } catch (err) {
+                console.error("Error loading users:", err);
+                document.getElementById("usersListContainer").innerHTML = `<div class="alert alert-danger">Unable to load patients.</div>`;
+            }
+        }
+
+        async function searchPatientByRef() {
+            const patientId = document.getElementById("searchPatientRef").value.trim();
+            if (!patientId) {
+                alert("Please enter a Patient Reference ID");
+                return;
+            }
+            const user = JSON.parse(localStorage.getItem("user"));
+            try {
+                const response = await fetch(`http://localhost:5000/api/admin/patient/${patientId}`, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const patient = await response.json();
+                if (response.ok) {
+                    displayPatientDetails(patient);
+                } else {
+                    document.getElementById("userSearchResult").innerHTML = `<div class="alert alert-danger">${patient.message}</div>`;
+                }
+            } catch (err) {
+                console.error("Error:", err);
+                document.getElementById("userSearchResult").innerHTML = `<div class="alert alert-danger">Network error</div>`;
+            }
+        }
+
+        function displayPatientDetails(patient) {
+            const container = document.getElementById("userSearchResult");
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Patient Details - ${patient.patientId}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6"><strong>Name:</strong> ${patient.name}</div>
+                            <div class="col-md-6"><strong>Email:</strong> ${patient.email}</div>
+                            <div class="col-md-6"><strong>Phone:</strong> ${patient.phone}</div>
+                            <div class="col-md-6"><strong>Age:</strong> ${patient.age || 'N/A'}</div>
+                            <div class="col-md-6"><strong>Gender:</strong> ${patient.gender || 'N/A'}</div>
+                            <div class="col-md-6"><strong>Blood Group:</strong> ${patient.bloodGroup || 'N/A'}</div>
+                            <div class="col-md-12"><strong>Address:</strong> ${patient.address || 'N/A'}</div>
+                        </div>
+                        <hr>
+                        <h6>Medical History</h6>
+                        <div id="patientAppointments">${patient.name}'s appointments loading...</div>
+                        <div class="mt-3">
+                            <button class="btn btn-success" onclick="assignDoctor('${patient._id}')">Assign Doctor</button>
+                            <button class="btn btn-warning" onclick="markPayment('${patient._id}')">Mark Payment</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            loadPatientAppointments(patient._id);
+        }
+
+        async function loadPatientAppointments(patientId) {
+            const user = JSON.parse(localStorage.getItem("user"));
+            try {
+                const response = await fetch(`http://localhost:5000/api/appointments/patient/${patientId}`, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const appointments = await response.json();
+                const container = document.getElementById("patientAppointments");
+                if (!appointments.length) {
+                    container.innerHTML = "No appointments found.";
+                    return;
+                }
+                container.innerHTML = appointments.map(appt => `
+                    <div class="border p-2 mb-2">
+                        <strong>${appt.date} ${appt.time}</strong> - ${appt.status} - Payment: ${appt.paymentStatus}
+                        <br>Doctor: ${appt.doctor?.name || 'Not assigned'} | Notes: ${appt.notes}
+                        <div class="mt-2">
+                            ${appt.status === 'pending' || appt.status === 'hold' ? `<button class="btn btn-sm btn-success me-1" onclick="assignDoctor('${appt._id}')">Assign Doctor</button>` : ''}
+                            ${appt.paymentStatus === 'unpaid' ? `<button class="btn btn-sm btn-warning" onclick="markPayment('${appt._id}')">Mark Paid</button>` : ''}
+                        </div>
+                    </div>
+                `).join("");
+            } catch (err) {
+                console.error("Error:", err);
+                document.getElementById("patientAppointments").innerHTML = "Error loading appointments.";
+            }
+        }
+
+        async function assignDoctor(appointmentId) {
+            const doctorId = prompt("Enter Doctor ID to assign:");
+            if (!doctorId) return;
+            const user = JSON.parse(localStorage.getItem("user"));
+            try {
+                const response = await fetch(`http://localhost:5000/api/admin/appointment/${appointmentId}/assign`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${user.token}`
+                    },
+                    body: JSON.stringify({ doctorId })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert("Doctor assigned successfully");
+                    // Refresh
+                    searchPatientByRef();
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                console.error("Error:", err);
+                alert("Network error");
+            }
+        }
+
+        async function markPayment(appointmentId) {
+            const user = JSON.parse(localStorage.getItem("user"));
+            try {
+                const response = await fetch(`http://localhost:5000/api/admin/appointment/${appointmentId}/pay`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${user.token}`
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert("Payment marked as paid");
+                    // Refresh
+                    searchPatientByRef();
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                console.error("Error:", err);
+                alert("Network error");
+            }
+        }
+
+        function displayUsers(users) {
+            const container = document.getElementById("usersListContainer");
+            if (!users || !users.length) {
+                container.innerHTML = `
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-users fa-2x mb-3"></i>
+                        <div>No patients found.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(u => `
+                            <tr>
+                                <td>${u.name || '—'}</td>
+                                <td>${u.email || '—'}</td>
+                                <td><span class="badge bg-info">${u.role}</span></td>
+                                <td><span class="badge bg-${u.isActive ? 'success' : 'secondary'}">${u.isActive ? 'Active' : 'Inactive'}</span></td>
+                                <td>${new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="openPatientActionModal('${u._id}')">
+                                        <i class="fas fa-eye me-1"></i>View
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning me-1" onclick="openEditUserModal('${u._id}','${u.name}','${u.email}','${u.role}',${u.isActive})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteUserAdmin('${u._id}','${u.name}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function openEditUserModal(userId, name, email, role, isActive) {
+            const modalHtml = `
+                <div class="modal fade" id="editUserModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit User</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" id="editUserId" value="${userId}">
+                                <div class="mb-3">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="editUserName" value="${name}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="editUserEmail" value="${email}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Role</label>
+                                    <select class="form-select" id="editUserRole">
+                                        <option value="patient"  ${role==='patient'  ? 'selected':''}>Patient</option>
+                                        <option value="doctor"   ${role==='doctor'   ? 'selected':''}>Doctor</option>
+                                        <option value="admin"    ${role==='admin'    ? 'selected':''}>Admin</option>
+                                        <option value="hospital" ${role==='hospital' ? 'selected':''}>Hospital</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="editUserActive" ${isActive ? 'checked' : ''}>
+                                    <label class="form-check-label">Active</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" onclick="saveUserEdit()">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            modal.show();
+            document.getElementById('editUserModal').addEventListener('hidden.bs.modal', function() { this.remove(); });
+        }
+
+        async function saveUserEdit() {
+            const admin  = JSON.parse(localStorage.getItem("user"));
+            const userId = document.getElementById("editUserId").value;
+            const body   = {
+                name:     document.getElementById("editUserName").value.trim(),
+                email:    document.getElementById("editUserEmail").value.trim(),
+                role:     document.getElementById("editUserRole").value,
+                isActive: document.getElementById("editUserActive").checked,
+            };
+            try {
+                const res = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admin.token}` },
+                    body: JSON.stringify(body)
+                });
+                const json = await res.json();
+                if (res.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
+                    loadAdminUsers();
+                } else {
+                    alert(json.message || 'Failed to update user');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error');
+            }
+        }
+
+        async function deleteUserAdmin(userId, userName) {
+            if (!confirm(`Delete user "${userName}"? This cannot be undone.`)) return;
+            const admin = JSON.parse(localStorage.getItem("user"));
+            try {
+                const res = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${admin.token}` }
+                });
+                const json = await res.json();
+                if (res.ok) {
+                    loadAdminUsers();
+                } else {
+                    alert(json.message || 'Failed to delete user');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error');
+            }
+        }
+
+        async function searchPatientByRef() {
+            const ref = document.getElementById("searchPatientRef").value.trim();
+            const resultContainer = document.getElementById("userSearchResult");
+            resultContainer.innerHTML = "";
+
+            if (!ref) {
+                alert("Enter a patient reference ID to search.");
+                return;
+            }
+
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const response = await fetch(`http://localhost:5000/api/patients/search/${encodeURIComponent(ref)}`, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    resultContainer.innerHTML = `<div class="alert alert-warning">${data.message || 'Patient not found.'}</div>`;
+                    return;
+                }
+
+                const { patient, appointments } = await response.json();
+
+                resultContainer.innerHTML = `
+                    <div class="card border-info mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 class="card-title mb-1">${patient.name}</h5>
+                                    <p class="mb-1"><strong>Reference ID:</strong> ${patient.patientId}</p>
+                                    <p class="mb-0"><strong>Email:</strong> ${patient.email || 'N/A'}</p>
+                                    <p class="mb-0"><strong>Phone:</strong> ${patient.phone || 'N/A'}</p>
+                                </div>
+                                <button class="btn btn-success" onclick="openPatientActionModal('${patient._id}')">
+                                    <i class="fas fa-hand-holding-medical me-1"></i>Assign Doctor / Payment
+                                </button>
+                            </div>
+                            <div>
+                                <h6 class="mb-2">Appointments</h6>
+                                ${appointments && appointments.length ? `
+                                    <ul class="list-group list-group-flush">
+                                        ${appointments.map(app => `
+                                            <li class="list-group-item">
+                                                <strong>${app.date} ${app.time}</strong> - ${app.status}
+                                                <div><small>${app.doctor ? app.doctor.name : 'No doctor assigned'}</small></div>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                ` : `<p class="text-muted mb-0">No appointments found for this patient.</p>`}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                console.error("Search failed:", err);
+                resultContainer.innerHTML = `<div class="alert alert-danger">Unable to search patient now.</div>`;
+            }
+        }
+
+        function showHospitalManagement() { addNewHospital(); }
+
+        function addNewUser() {
+            const modalHtml = `
+                <div class="modal fade" id="addPatientModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add New Patient</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addPatientForm">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Full Name *</label>
+                                            <input type="text" class="form-control" id="patientName" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="patientEmail">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Phone</label>
+                                            <input type="text" class="form-control" id="patientPhone">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Age</label>
+                                            <input type="number" class="form-control" id="patientAge">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Gender</label>
+                                            <select class="form-select" id="patientGender">
+                                                <option value="">Select</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Address</label>
+                                            <input type="text" class="form-control" id="patientAddress">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-success" onclick="createPatient()">Create Patient</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('addPatientModal'));
+            modal.show();
+            document.getElementById('addPatientModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        async function createPatient() {
+            const name = document.getElementById('patientName').value.trim();
+            const email = document.getElementById('patientEmail').value.trim();
+            const phone = document.getElementById('patientPhone').value.trim();
+            const age = parseInt(document.getElementById('patientAge').value, 10) || null;
+            const gender = document.getElementById('patientGender').value;
+            const address = document.getElementById('patientAddress').value.trim();
+
+            if (!name) {
+                alert('Name is required.');
+                return;
+            }
+
+            try {
+                const admin = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch('http://localhost:5000/api/patients', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${admin.token}`
+                    },
+                    body: JSON.stringify({ name, email, phone, age, gender, address })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    alert(data.message || 'Unable to create patient');
+                    return;
+                }
+
+                alert('Patient created successfully');
+                bootstrap.Modal.getInstance(document.getElementById('addPatientModal')).hide();
+                loadAdminUsers();
+            } catch (err) {
+                console.error('Create patient error:', err);
+                alert('Server error while creating patient');
+            }
+        }
+
+        async function openPatientActionModal(patientId) {
+            try {
+                const admin = JSON.parse(localStorage.getItem('user'));
+
+                const [patientRes, doctorsRes] = await Promise.all([
+                    fetch(`http://localhost:5000/api/users/${patientId}`, {
+                        headers: { Authorization: `Bearer ${admin.token}` }
+                    }),
+                    fetch('http://localhost:5000/api/admin/doctors', {
+                        headers: { Authorization: `Bearer ${admin.token}` }
+                    })
+                ]);
+
+                const patientJson  = await patientRes.json();
+                const doctorsJson  = await doctorsRes.json();
+
+                const patient = patientJson.data?.user  || {};
+                const doctors = doctorsJson.data?.doctors || [];
+
+                const modalHtml = `
+                    <div class="modal fade" id="patientActionModal" tabindex="-1">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Patient Management: ${patient.name || 'Unknown'}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row gy-3">
+                                        <div class="col-lg-6">
+                                            <div class="card mb-3">
+                                                <div class="card-body">
+                                                    <h6>Patient Details</h6>
+                                                    <p><strong>Reference ID:</strong> ${patient.patientId || '-'}</p>
+                                                    <p><strong>Email:</strong> ${patient.email || '-'}</p>
+                                                    <p><strong>Phone:</strong> ${patient.phone || '-'}</p>
+                                                    <p><strong>Age:</strong> ${patient.age || '-'}</p>
+                                                    <p><strong>Gender:</strong> ${patient.gender || '-'}</p>
+                                                    <p><strong>Address:</strong> ${patient.address || '-'}</p>
+                                                </div>
+                                            </div>
+                                            <div class="card mb-3">
+                                                <div class="card-body">
+                                                    <h6>Assign Doctor & Create Payment</h6>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Doctor</label>
+                                                        <select id="billingDoctor" class="form-select">
+                                                            <option value="">Select doctor</option>
+                                                            ${doctors.map(doc => `<option value="${doc._id}">${doc.name} (${doc.specialization || doc.doctorId || 'Doctor'})</option>`).join('')}
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Amount</label>
+                                                        <input type="number" id="billingAmount" class="form-control" placeholder="Enter payment amount">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Notes</label>
+                                                        <textarea id="billingNotes" class="form-control" rows="2" placeholder="Doctor assignment or payment notes"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="card mb-3">
+                                                <div class="card-body">
+                                                    <h6>Online Appointment History</h6>
+                                                    ${Array.isArray(appointments) && appointments.length ? `
+                                                        <ul class="list-group">
+                                                            ${appointments.map(app => `
+                                                                <li class="list-group-item">
+                                                                    <strong>${app.date} ${app.time}</strong><br>
+                                                                    Status: <span class="badge bg-${app.status === 'pending' ? 'warning' : app.status === 'confirmed' ? 'success' : 'secondary'}">${app.status}</span><br>
+                                                                    Doctor: ${app.doctor?.name || 'Not assigned'}
+                                                                </li>
+                                                            `).join('')}
+                                                        </ul>
+                                                    ` : `<p class="text-muted mb-0">No appointments found.</p>`}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-success" onclick="createBillingForPatient('${patient._id}')">Create Payment & Assign</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                const modal = new bootstrap.Modal(document.getElementById('patientActionModal'));
+                modal.show();
+                document.getElementById('patientActionModal').addEventListener('hidden.bs.modal', function() {
+                    this.remove();
+                });
+            } catch (err) {
+                console.error('Error opening patient action modal:', err);
+                alert('Unable to open patient management modal.');
+            }
+        }
+
+        async function createBillingForPatient(patientId) {
+            const doctor = document.getElementById('billingDoctor').value;
+            const amount = parseFloat(document.getElementById('billingAmount').value);
+            const notes = document.getElementById('billingNotes').value.trim();
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount.');
+                return;
+            }
+
+            try {
+                const admin = JSON.parse(localStorage.getItem('user'));
+                const response = await fetch('http://localhost:5000/api/billing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${admin.token}`
+                    },
+                    body: JSON.stringify({ patient: patientId, doctor: doctor || undefined, amount, notes })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    alert(data.message || 'Unable to create billing record');
+                    return;
+                }
+
+                alert('Payment record created successfully.');
+                bootstrap.Modal.getInstance(document.getElementById('patientActionModal')).hide();
+            } catch (err) {
+                console.error('Create billing error:', err);
+                alert('Server error while saving payment.');
+            }
+        }
+
+        function addNewHospital() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'hospital-management') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'hospital-management';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-building me-2"></i>Hospital Management</h2>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" onclick="loadHospitals()">
+                            <i class="fas fa-sync me-1"></i>Refresh
+                        </button>
+                        <button class="btn btn-success" onclick="showAddHospitalModal()">
+                            <i class="fas fa-plus me-1"></i>Add Hospital
+                        </button>
+                    </div>
+                </div>
+
+                <div id="hospitalsList" class="row">
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading hospitals...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            loadHospitals();
+        }
+
+        function showAppointmentManagement() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'appointment-management') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'appointment-management';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-alt me-2"></i>Appointment Management</h2>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <select class="form-select" style="max-width: 180px;" id="apptStatusFilter" onchange="loadAdminAppointments()">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button class="btn btn-outline-secondary" onclick="loadAdminAppointments()">
+                            <i class="fas fa-sync me-1"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">All Appointments</h5>
+                        <span id="apptCount" class="badge bg-secondary">Loading...</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Patient</th>
+                                        <th>Doctor</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                        <th>Notes</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="appointmentsTableBody">
+                                    <tr><td colspan="7" class="text-center py-4 text-muted">
+                                        <div class="spinner-border spinner-border-sm me-2"></div>Loading...
+                                    </td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            loadAdminAppointments();
+        }
+
+        async function loadAdminAppointments() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            const statusFilter = document.getElementById("apptStatusFilter")?.value || "all";
+            const tbody = document.getElementById("appointmentsTableBody");
+            if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Loading...</td></tr>`;
+
+            try {
+                const url = statusFilter === 'all'
+                    ? "http://localhost:5000/api/admin/appointments"
+                    : `http://localhost:5000/api/admin/appointments?status=${statusFilter}`;
+
+                const res = await fetch(url, { headers: { Authorization: `Bearer ${user.token}` } });
+                const json = await res.json();
+                console.log("Admin appointments:", json);
+
+                if (!res.ok) {
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${json.message || 'Error loading appointments'}</td></tr>`;
+                    return;
+                }
+
+                const appointments = json.data?.appointments || [];
+                const total = json.data?.pagination?.total || appointments.length;
+
+                const countEl = document.getElementById("apptCount");
+                if (countEl) countEl.textContent = total + ' total';
+
+                if (!appointments.length) {
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No appointments found</td></tr>`;
+                    return;
+                }
+
+                const statusColors = { pending: 'warning', confirmed: 'primary', completed: 'success', cancelled: 'secondary' };
+
+                if (tbody) tbody.innerHTML = appointments.map(appt => {
+                    const patientName = appt.patient?.name || 'Unknown';
+                    const doctorName  = appt.doctor?.name  || 'Unknown';
+                    const dateStr     = appt.date ? new Date(appt.date).toLocaleDateString('en-IN') : '—';
+                    const color       = statusColors[appt.status] || 'secondary';
+                    return `
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">${patientName}</div>
+                                <small class="text-muted">${appt.patient?.email || ''}</small>
+                            </td>
+                            <td>
+                                <div>${doctorName}</div>
+                                <small class="text-muted">${appt.doctor?.specialization || ''}</small>
+                            </td>
+                            <td>${dateStr}</td>
+                            <td>${appt.time || '—'}</td>
+                            <td><span class="badge bg-${color}">${appt.status}</span></td>
+                            <td><small>${appt.notes || '—'}</small></td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                        Status
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#" onclick="setApptStatus('${appt._id}','confirmed')">Confirm</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="setApptStatus('${appt._id}','completed')">Complete</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="setApptStatus('${appt._id}','cancelled')">Cancel</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error("Load appointments error:", err);
+                if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Network error loading appointments</td></tr>`;
+            }
+        }
+
+        async function setApptStatus(apptId, status) {
+            const user = JSON.parse(localStorage.getItem("user"));
+            try {
+                const res = await fetch(`http://localhost:5000/api/admin/appointments/${apptId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
+                    body: JSON.stringify({ status })
+                });
+                const json = await res.json();
+                if (res.ok) {
+                    loadAdminAppointments();
+                } else {
+                    alert(json.message || 'Failed to update status');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error');
+            }
+        }
+
+        function showSystemReports() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'system-reports') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'system-reports';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header d-flex justify-content-between align-items-center mb-3">
+                    <h2><i class="fas fa-chart-bar me-2"></i>System Reports & Analytics</h2>
+                    <div class="d-flex gap-2 align-items-center">
+                        <select class="form-select form-select-sm" id="reportDaysFilter" onchange="loadSystemReports()" style="max-width:160px;">
+                            <option value="7">Last 7 days</option>
+                            <option value="14" selected>Last 14 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                        </select>
+                        <button class="btn btn-sm btn-outline-primary" onclick="loadSystemReports()">
+                            <i class="fas fa-sync me-1"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+                <div id="reportsContent">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mt-2">Loading reports...</p>
+                    </div>
+                </div>
+            `;
+
+            loadSystemReports();
+        }
+
+        async function loadSystemReports() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            const days = document.getElementById("reportDaysFilter")?.value || 14;
+            const el   = document.getElementById("reportsContent");
+            if (el) el.innerHTML = `<div class="text-center py-4"><div class="spinner-border text-primary"></div></div>`;
+
+            try {
+                const [statsRes, reportsRes] = await Promise.all([
+                    fetch("http://localhost:5000/api/admin/stats",              { headers: { Authorization: `Bearer ${user.token}` } }),
+                    fetch(`http://localhost:5000/api/admin/reports?days=${days}`, { headers: { Authorization: `Bearer ${user.token}` } }),
+                ]);
+                const statsJson   = await statsRes.json();
+                const reportsJson = await reportsRes.json();
+
+                const stats   = statsJson.data   || {};
+                const r       = reportsJson.data  || {};
+
+                const appt    = r.apptByStatus || {};
+                const roles   = r.roleMap      || {};
+                const total   = (appt.pending||0) + (appt.confirmed||0) + (appt.completed||0) + (appt.cancelled||0);
+                const revenue = r.revenueEstimate || 0;
+                const activity = r.activityLog || [];
+
+                // Build date labels for trend charts
+                const trendLabels = (r.userTrend || []).map(t => t._id);
+                const userCounts  = (r.userTrend || []).map(t => t.count);
+                const patientLabels = (r.patientTrend || []).map(t => t._id);
+                const patientCounts = (r.patientTrend || []).map(t => t.count);
+                const apptLabels  = (r.apptTrend || []).map(t => t._id);
+                const apptCounts  = (r.apptTrend || []).map(t => t.count);
+
+                el.innerHTML = `
+                    <!-- KPI cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-2 col-6">
+                            <div class="card text-center border-primary h-100">
+                                <div class="card-body py-3">
+                                    <div class="h3 mb-0 text-primary">${stats.totalUsers ?? 0}</div>
+                                    <small class="text-muted">Total Users</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <div class="card text-center border-info h-100">
+                                <div class="card-body py-3">
+                                    <div class="h3 mb-0 text-info">${r.totalPatients ?? 0}</div>
+                                    <small class="text-muted">Patients</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <div class="card text-center border-success h-100">
+                                <div class="card-body py-3">
+                                    <div class="h3 mb-0 text-success">${r.newPatientsThisMonth ?? 0}</div>
+                                    <small class="text-muted">New This Month</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <div class="card text-center border-warning h-100">
+                                <div class="card-body py-3">
+                                    <div class="h3 mb-0 text-warning">${stats.totalDoctors ?? 0}</div>
+                                    <small class="text-muted">Doctors</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <div class="card text-center border-secondary h-100">
+                                <div class="card-body py-3">
+                                    <div class="h3 mb-0 text-secondary">${stats.totalAppointments ?? 0}</div>
+                                    <small class="text-muted">Appointments</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-6">
+                            <div class="card text-center border-success h-100">
+                                <div class="card-body py-3">
+                                    <div class="h3 mb-0 text-success">₹${revenue.toLocaleString('en-IN')}</div>
+                                    <small class="text-muted">Est. Revenue</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts row -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-lg-8">
+                            <div class="card h-100">
+                                <div class="card-header"><h5 class="mb-0">User & Patient Registrations (Last ${days} days)</h5></div>
+                                <div class="card-body"><canvas id="registrationChart" height="100"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-header"><h5 class="mb-0">Appointment Status</h5></div>
+                                <div class="card-body d-flex align-items-center justify-content-center">
+                                    <canvas id="apptStatusChart" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-lg-8">
+                            <div class="card h-100">
+                                <div class="card-header"><h5 class="mb-0">Appointments Booked Per Day (Last ${days} days)</h5></div>
+                                <div class="card-body"><canvas id="apptTrendChart" height="100"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="card h-100">
+                                <div class="card-header"><h5 class="mb-0">User Role Breakdown</h5></div>
+                                <div class="card-body">
+                                    <table class="table table-sm mb-0">
+                                        <tbody>
+                                            <tr><td>Patients</td>  <td class="text-end"><span class="badge bg-info px-3">${roles.patient ?? 0}</span></td></tr>
+                                            <tr><td>Doctors</td>   <td class="text-end"><span class="badge bg-success px-3">${roles.doctor ?? 0}</span></td></tr>
+                                            <tr><td>Admins</td>    <td class="text-end"><span class="badge bg-dark px-3">${roles.admin ?? 0}</span></td></tr>
+                                            <tr><td>Hospitals</td> <td class="text-end"><span class="badge bg-warning px-3">${roles.hospital ?? 0}</span></td></tr>
+                                        </tbody>
+                                    </table>
+                                    <hr>
+                                    <table class="table table-sm mb-0">
+                                        <tbody>
+                                            <tr><td>Pending</td>   <td class="text-end"><span class="badge bg-warning px-3">${appt.pending ?? 0}</span></td></tr>
+                                            <tr><td>Confirmed</td> <td class="text-end"><span class="badge bg-primary px-3">${appt.confirmed ?? 0}</span></td></tr>
+                                            <tr><td>Completed</td> <td class="text-end"><span class="badge bg-success px-3">${appt.completed ?? 0}</span></td></tr>
+                                            <tr><td>Cancelled</td> <td class="text-end"><span class="badge bg-secondary px-3">${appt.cancelled ?? 0}</span></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue summary -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white"><h5 class="mb-0"><i class="fas fa-rupee-sign me-2"></i>Revenue Estimate</h5></div>
+                                <div class="card-body">
+                                    <div class="row text-center g-3">
+                                        <div class="col-4">
+                                            <div class="h4 text-success">₹${revenue.toLocaleString('en-IN')}</div>
+                                            <small class="text-muted">Total Estimated</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="h4 text-primary">${r.completedAppointments ?? 0}</div>
+                                            <small class="text-muted">Completed Appts</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="h4 text-muted">₹500</div>
+                                            <small class="text-muted">Per Appointment</small>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info mt-3 mb-0 py-2 small">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Revenue is estimated at ₹500 per completed appointment.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-info">
+                                <div class="card-header bg-info text-white"><h5 class="mb-0"><i class="fas fa-users me-2"></i>Patient Statistics</h5></div>
+                                <div class="card-body">
+                                    <div class="row text-center g-3">
+                                        <div class="col-4">
+                                            <div class="h4 text-info">${r.totalPatients ?? 0}</div>
+                                            <small class="text-muted">Total Patients</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="h4 text-success">${r.newPatientsThisMonth ?? 0}</div>
+                                            <small class="text-muted">New This Month</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="h4 text-primary">${(r.patientTrend || []).reduce((s,t) => s+t.count, 0)}</div>
+                                            <small class="text-muted">Last ${days} Days</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <div class="card-header"><h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Activity</h5></div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                ${activity.length ? activity.map(a => `
+                                    <li class="list-group-item d-flex align-items-center gap-3 py-2">
+                                        <span class="badge bg-${a.color} rounded-circle p-2">
+                                            <i class="fas fa-${a.icon}"></i>
+                                        </span>
+                                        <div class="flex-fill">
+                                            <div>${a.text}</div>
+                                        </div>
+                                        <small class="text-muted text-nowrap">${new Date(a.timestamp).toLocaleString('en-IN', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</small>
+                                    </li>`).join('')
+                                : '<li class="list-group-item text-muted text-center py-3">No recent activity</li>'}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+
+                // ── Draw charts with Chart.js ─────────────────────────────
+                drawReportCharts({ trendLabels, userCounts, patientLabels, patientCounts, apptLabels, apptCounts, appt });
+
+            } catch (err) {
+                console.error("Reports error:", err);
+                if (el) el.innerHTML = `<div class="alert alert-danger">Error loading reports: ${err.message}</div>`;
+            }
+        }
+
+        function drawReportCharts({ trendLabels, userCounts, patientLabels, patientCounts, apptLabels, apptCounts, appt }) {
+            // Destroy existing charts to avoid canvas reuse errors
+            ['registrationChart','apptStatusChart','apptTrendChart'].forEach(id => {
+                const existing = Chart.getChart(id);
+                if (existing) existing.destroy();
+            });
+
+            // ── Registration trend (line) ─────────────────────────────────
+            const regCtx = document.getElementById('registrationChart')?.getContext('2d');
+            if (regCtx) {
+                new Chart(regCtx, {
+                    type: 'line',
+                    data: {
+                        labels: trendLabels.length ? trendLabels : ['No data'],
+                        datasets: [
+                            {
+                                label: 'All Users',
+                                data: userCounts,
+                                borderColor: '#0d6efd',
+                                backgroundColor: 'rgba(13,110,253,0.1)',
+                                fill: true,
+                                tension: 0.3,
+                            },
+                            {
+                                label: 'Patients',
+                                data: patientCounts,
+                                borderColor: '#0dcaf0',
+                                backgroundColor: 'rgba(13,202,240,0.1)',
+                                fill: true,
+                                tension: 0.3,
+                            },
+                        ],
+                    },
+                    options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } },
+                });
+            }
+
+            // ── Appointment status (doughnut) ─────────────────────────────
+            const statusCtx = document.getElementById('apptStatusChart')?.getContext('2d');
+            if (statusCtx) {
+                const statusData = [appt.pending||0, appt.confirmed||0, appt.completed||0, appt.cancelled||0];
+                new Chart(statusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+                        datasets: [{ data: statusData, backgroundColor: ['#ffc107','#0d6efd','#198754','#6c757d'], borderWidth: 2 }],
+                    },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } },
+                });
+            }
+
+            // ── Appointments per day (bar) ────────────────────────────────
+            const apptCtx = document.getElementById('apptTrendChart')?.getContext('2d');
+            if (apptCtx) {
+                new Chart(apptCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: apptLabels.length ? apptLabels : ['No data'],
+                        datasets: [{
+                            label: 'Appointments Booked',
+                            data: apptCounts,
+                            backgroundColor: 'rgba(25,135,84,0.7)',
+                            borderColor: '#198754',
+                            borderWidth: 1,
+                        }],
+                    },
+                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } },
+                });
+            }
+        }
+
+        function addNewUser() {
+            alert('Add new user functionality would open a modal or navigate to user creation page');
+        }
+
+        function filterUsers(type) {
+            alert('Filtering users by type: ' + type);
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // ALERT MANAGEMENT
+        // ═══════════════════════════════════════════════════════════════════
+
+        function showAlertManagement() {
+            const container = document.getElementById("mainContent");
+
+            if (container.style.display === 'block' && container.dataset.currentSection === 'alert-management') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.dataset.currentSection = 'alert-management';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <div class="section-header d-flex justify-content-between align-items-center mb-3">
+                    <h2><i class="fas fa-bell me-2"></i>Alert Management</h2>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="loadSentAlerts()">
+                        <i class="fas fa-sync me-1"></i>Refresh History
+                    </button>
+                </div>
+
+                <!-- Send Alert Form -->
+                <div class="card border-danger mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="fas fa-paper-plane me-2"></i>Send New Alert</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Alert Type *</label>
+                                <select class="form-select" id="alertType">
+                                    <option value="info">ℹ️ Info</option>
+                                    <option value="warning">⚠️ Warning</option>
+                                    <option value="emergency">🚨 Emergency</option>
+                                    <option value="reminder">🔔 Reminder</option>
+                                    <option value="critical">🔴 Critical</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Target Recipients *</label>
+                                <select class="form-select" id="alertTarget" onchange="toggleSpecificUser()">
+                                    <option value="all">Everyone (all users)</option>
+                                    <option value="patient">All Patients</option>
+                                    <option value="doctor">All Doctors</option>
+                                    <option value="specific">Specific User (by email)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4" id="specificUserField" style="display:none;">
+                                <label class="form-label fw-semibold">User Email *</label>
+                                <input type="email" class="form-control" id="alertUserEmail"
+                                       placeholder="patient@example.com">
+                                <small class="text-muted">We'll look up the user ID from this email.</small>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Message *</label>
+                                <textarea class="form-control" id="alertMessage" rows="3"
+                                          placeholder="Enter your alert message here..." maxlength="500"></textarea>
+                                <small class="text-muted"><span id="alertCharCount">0</span>/500 characters</small>
+                            </div>
+                        </div>
+                        <div id="alertSendMsg" class="mt-3"></div>
+                        <div class="mt-3">
+                            <button class="btn btn-danger" id="sendAlertBtn" onclick="sendAlert()">
+                                <i class="fas fa-paper-plane me-2"></i>Send Alert
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sent Alerts History -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <h5 class="mb-0"><i class="fas fa-history me-2"></i>Sent Alerts History</h5>
+                        <div class="d-flex gap-2 flex-wrap align-items-center">
+                            <input type="text" class="form-control form-control-sm" id="alertSearch"
+                                   placeholder="Search message / recipient..." style="max-width:220px;"
+                                   oninput="loadSentAlerts()">
+                            <select class="form-select form-select-sm" id="alertFilterType" onchange="loadSentAlerts()" style="max-width:130px;">
+                                <option value="">All Types</option>
+                                <option value="info">Info</option>
+                                <option value="warning">Warning</option>
+                                <option value="emergency">Emergency</option>
+                                <option value="reminder">Reminder</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                            <select class="form-select form-select-sm" id="alertFilterStatus" onchange="loadSentAlerts()" style="max-width:120px;">
+                                <option value="">All Status</option>
+                                <option value="unread">Unread</option>
+                                <option value="read">Read</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="loadSentAlerts()">
+                                <i class="fas fa-sync"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0" id="sentAlertsContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-danger"></div>
+                            <p class="mt-2 text-muted">Loading history...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Character counter
+            document.getElementById('alertMessage').addEventListener('input', function() {
+                document.getElementById('alertCharCount').textContent = this.value.length;
+            });
+
+            loadSentAlerts();
+        }
+
+        function toggleSpecificUser() {
+            const target = document.getElementById('alertTarget').value;
+            document.getElementById('specificUserField').style.display =
+                target === 'specific' ? 'block' : 'none';
+        }
+
+        async function sendAlert() {
+            const admin   = JSON.parse(localStorage.getItem("user"));
+            const type    = document.getElementById('alertType').value;
+            const target  = document.getElementById('alertTarget').value;
+            const message = document.getElementById('alertMessage').value.trim();
+            const msgEl   = document.getElementById('alertSendMsg');
+            const btn     = document.getElementById('sendAlertBtn');
+
+            if (!message) {
+                msgEl.innerHTML = '<div class="alert alert-warning py-2">Message is required.</div>';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+            msgEl.innerHTML = '';
+
+            try {
+                let body = { message, type };
+
+                if (target === 'specific') {
+                    const email = document.getElementById('alertUserEmail').value.trim();
+                    if (!email) {
+                        msgEl.innerHTML = '<div class="alert alert-warning py-2">Please enter a user email.</div>';
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Alert';
+                        return;
+                    }
+                    // Look up user by email
+                    const userRes  = await fetch(`http://localhost:5000/api/admin/users?search=${encodeURIComponent(email)}&limit=1`, {
+                        headers: { Authorization: `Bearer ${admin.token}` }
+                    });
+                    const userJson = await userRes.json();
+                    const found    = userJson.data?.users?.[0];
+                    if (!found) {
+                        msgEl.innerHTML = `<div class="alert alert-danger py-2">No user found with email: ${email}</div>`;
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Alert';
+                        return;
+                    }
+                    body.userId = found._id;
+                } else {
+                    body.targetRole = target;   // 'all', 'patient', 'doctor'
+                }
+
+                const res  = await fetch('http://localhost:5000/api/alerts', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admin.token}` },
+                    body:    JSON.stringify(body),
+                });
+                const json = await res.json();
+                console.log('Send alert response:', json);
+
+                if (res.ok) {
+                    const count = json.data?.count || 1;
+                    msgEl.innerHTML = `<div class="alert alert-success py-2">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Alert sent to <strong>${count}</strong> user(s) successfully!
+                    </div>`;
+                    document.getElementById('alertMessage').value = '';
+                    document.getElementById('alertCharCount').textContent = '0';
+                    setTimeout(() => loadSentAlerts(), 500);
+                } else {
+                    const errMsg = json.errors?.map(e => e.msg).join(', ') || json.message || 'Failed to send alert';
+                    msgEl.innerHTML = `<div class="alert alert-danger py-2">${errMsg}</div>`;
+                }
+            } catch (err) {
+                console.error('sendAlert error:', err);
+                msgEl.innerHTML = '<div class="alert alert-danger py-2">Network error sending alert.</div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Alert';
+            }
+        }
+
+        async function loadSentAlerts() {
+            const admin = JSON.parse(localStorage.getItem("user"));
+            const el    = document.getElementById('sentAlertsContainer');
+            if (!el) return;
+
+            // Read current filter values (if the filter bar is rendered)
+            const typeFilter   = document.getElementById('alertFilterType')?.value   || '';
+            const statusFilter = document.getElementById('alertFilterStatus')?.value || '';
+            const searchTerm   = (document.getElementById('alertSearch')?.value || '').toLowerCase();
+
+            try {
+                const res  = await fetch('http://localhost:5000/api/alerts/admin/all?limit=100', {
+                    headers: { Authorization: `Bearer ${admin.token}` }
+                });
+                const json = await res.json();
+                let alerts = json.data?.alerts || [];
+
+                // Client-side filter (avoids extra API params)
+                if (typeFilter)   alerts = alerts.filter(a => a.type === typeFilter);
+                if (statusFilter) alerts = alerts.filter(a => a.status === statusFilter);
+                if (searchTerm)   alerts = alerts.filter(a =>
+                    a.message.toLowerCase().includes(searchTerm) ||
+                    (a.userId?.name  || '').toLowerCase().includes(searchTerm) ||
+                    (a.userId?.email || '').toLowerCase().includes(searchTerm)
+                );
+
+                const total = json.data?.pagination?.total ?? json.data?.alerts?.length ?? 0;
+
+                if (!alerts.length) {
+                    el.innerHTML = `<div class="text-center py-4 text-muted">
+                        <i class="fas fa-bell-slash fa-2x mb-2 d-block"></i>
+                        ${typeFilter || statusFilter || searchTerm ? 'No alerts match your filters.' : 'No alerts sent yet.'}
+                    </div>`;
+                    return;
+                }
+
+                const TYPE_BADGE = {
+                    emergency: 'danger',  critical: 'danger',
+                    warning:   'warning', outbreak: 'warning',
+                    info:      'info',    reminder: 'primary',
+                };
+                const TYPE_ICON = {
+                    emergency: 'exclamation-triangle', critical: 'exclamation-circle',
+                    warning:   'exclamation-triangle', outbreak: 'biohazard',
+                    info:      'info-circle',          reminder: 'bell',
+                };
+                const STATUS_BADGE = { unread: 'secondary', read: 'success' };
+
+                el.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom bg-light">
+                        <small class="text-muted">Showing <strong>${alerts.length}</strong> of <strong>${total}</strong> alerts</small>
+                        <button class="btn btn-sm btn-outline-danger" onclick="bulkDeleteAlerts()" title="Delete all visible alerts">
+                            <i class="fas fa-trash-alt me-1"></i>Delete All Visible
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm mb-0" id="alertsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:36px;">
+                                        <input type="checkbox" id="selectAllAlerts" title="Select all"
+                                               onchange="toggleSelectAllAlerts(this)">
+                                    </th>
+                                    <th>Type</th>
+                                    <th>Message</th>
+                                    <th>Recipient</th>
+                                    <th>Status</th>
+                                    <th>Sent</th>
+                                    <th style="width:80px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${alerts.map(a => `
+                                    <tr id="alert-row-${a._id}">
+                                        <td>
+                                            <input type="checkbox" class="alert-checkbox" value="${a._id}">
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-${TYPE_BADGE[a.type]||'secondary'}">
+                                                <i class="fas fa-${TYPE_ICON[a.type]||'bell'} me-1"></i>${a.type}
+                                            </span>
+                                        </td>
+                                        <td style="max-width:260px;">
+                                            <span title="${a.message.replace(/"/g,'&quot;')}"
+                                                  class="d-inline-block text-truncate" style="max-width:240px;">
+                                                ${a.message}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold">${a.userId?.name || '—'}</div>
+                                            <small class="text-muted">${a.userId?.email || ''}</small>
+                                            ${a.userId?.role ? `<span class="badge bg-light text-dark border ms-1" style="font-size:0.65rem;">${a.userId.role}</span>` : ''}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-${STATUS_BADGE[a.status]||'secondary'}">
+                                                ${a.status === 'read'
+                                                    ? '<i class="fas fa-check me-1"></i>Read'
+                                                    : '<i class="fas fa-circle me-1"></i>Unread'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                ${new Date(a.createdAt).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="deleteAdminAlert('${a._id}')"
+                                                    title="Delete this alert">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (err) {
+                console.error('loadSentAlerts error:', err);
+                if (el) el.innerHTML = '<div class="alert alert-danger m-3">Error loading alert history.</div>';
+            }
+        }
+
+        // ── Delete a single alert ─────────────────────────────────────────────
+        async function deleteAdminAlert(alertId) {
+            if (!confirm('Delete this alert? The recipient will no longer see it.')) return;
+
+            const admin = JSON.parse(localStorage.getItem("user"));
+            // Optimistic UI — remove row immediately
+            const row = document.getElementById(`alert-row-${alertId}`);
+            if (row) {
+                row.style.transition = 'opacity 0.25s';
+                row.style.opacity = '0';
+                setTimeout(() => row.remove(), 260);
+            }
+
+            try {
+                const res  = await fetch(`http://localhost:5000/api/alerts/${alertId}`, {
+                    method:  'DELETE',
+                    headers: { Authorization: `Bearer ${admin.token}` },
+                });
+                const json = await res.json();
+                if (!res.ok) {
+                    console.error('deleteAdminAlert failed:', json.message);
+                    // Reload to restore state if server rejected
+                    loadSentAlerts();
+                }
+            } catch (err) {
+                console.error('deleteAdminAlert error:', err);
+                loadSentAlerts();
+            }
+        }
+
+        // ── Bulk delete selected alerts ───────────────────────────────────────
+        async function bulkDeleteAlerts() {
+            const checkboxes = document.querySelectorAll('.alert-checkbox:checked');
+            const ids = [...checkboxes].map(cb => cb.value);
+
+            if (!ids.length) {
+                // No checkboxes checked — delete all visible rows
+                const allCheckboxes = document.querySelectorAll('.alert-checkbox');
+                if (!allCheckboxes.length) return;
+                const allIds = [...allCheckboxes].map(cb => cb.value);
+                if (!confirm(`Delete all ${allIds.length} visible alert(s)? This cannot be undone.`)) return;
+                await _doBulkDelete(allIds);
+            } else {
+                if (!confirm(`Delete ${ids.length} selected alert(s)?`)) return;
+                await _doBulkDelete(ids);
+            }
+        }
+
+        async function _doBulkDelete(ids) {
+            const admin = JSON.parse(localStorage.getItem("user"));
+            // Optimistic UI
+            ids.forEach(id => {
+                const row = document.getElementById(`alert-row-${id}`);
+                if (row) { row.style.opacity = '0'; setTimeout(() => row.remove(), 260); }
+            });
+
+            try {
+                const res  = await fetch('http://localhost:5000/api/alerts', {
+                    method:  'DELETE',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admin.token}` },
+                    body:    JSON.stringify({ ids }),
+                });
+                const json = await res.json();
+                if (res.ok) {
+                    // Show brief success toast
+                    const msgEl = document.getElementById('alertSendMsg');
+                    if (msgEl) {
+                        msgEl.innerHTML = `<div class="alert alert-success py-2">
+                            <i class="fas fa-check-circle me-2"></i>${json.data?.deletedCount ?? ids.length} alert(s) deleted.
+                        </div>`;
+                        setTimeout(() => { if (msgEl) msgEl.innerHTML = ''; }, 3000);
+                    }
+                    setTimeout(() => loadSentAlerts(), 300);
+                } else {
+                    console.error('bulkDelete failed:', json.message);
+                    loadSentAlerts();
+                }
+            } catch (err) {
+                console.error('_doBulkDelete error:', err);
+                loadSentAlerts();
+            }
+        }
+
+        // ── Select / deselect all checkboxes ─────────────────────────────────
+        function toggleSelectAllAlerts(masterCb) {
+            document.querySelectorAll('.alert-checkbox').forEach(cb => {
+                cb.checked = masterCb.checked;
+            });
+        }
+
+        // HOSPITAL MANAGEMENT FUNCTIONS
+        async function loadHospitals() {
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const response = await fetch("http://localhost:5000/api/hospital", {
+                    headers: { "Authorization": `Bearer ${user.token}` }
+                });
+
+                const json = await response.json();
+                console.log("Hospitals response:", json);
+
+                // Response: { success, message, data: { hospitals: [...] } }
+                const hospitals = json.data?.hospitals || [];
+                displayHospitals(hospitals);
+            } catch (error) {
+                console.error("Error loading hospitals:", error);
+                const el = document.getElementById("hospitalsList");
+                if (el) el.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Error loading hospitals. Please try again.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function displayHospitals(hospitals) {
+            const container = document.getElementById("hospitalsList");
+
+            if (!hospitals || hospitals.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-building fa-3x text-muted mb-3"></i>
+                            <h4>No Hospitals Found</h4>
+                            <p class="text-muted">Start by adding your first hospital</p>
+                            <button class="btn btn-primary" onclick="showAddHospitalModal()">
+                                <i class="fas fa-plus me-1"></i>Add First Hospital
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = "";
+            hospitals.forEach(hospital => {
+                const totalBeds = hospital.totalBeds || 0;
+                const availableBeds = hospital.availableBeds || 0;
+                const occupiedBeds = totalBeds - availableBeds;
+                const occupancyRate = totalBeds > 0 ? Math.round((occupiedBeds / totalBeds) * 100) : 0;
+
+                html += `
+                    <div class="col-lg-6 col-xl-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">${hospital.name}</h5>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="editHospital('${hospital._id}')">
+                                            <i class="fas fa-edit me-2"></i>Edit
+                                        </a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="manageDepartments('${hospital._id}')">
+                                            <i class="fas fa-sitemap me-2"></i>Departments
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteHospital('${hospital._id}')">
+                                            <i class="fas fa-trash me-2"></i>Delete
+                                        </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                                            <small class="text-muted">${hospital.address || 'No address provided'}</small>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-phone text-muted me-2"></i>
+                                            <small class="text-muted">${hospital.phone || 'No phone provided'}</small>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="fas fa-envelope text-muted me-2"></i>
+                                            <small class="text-muted">${hospital.email || 'No email provided'}</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <div class="h4 mb-0 text-primary">${totalBeds}</div>
+                                            <small class="text-muted">Total Beds</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <div class="h4 mb-0 text-success">${availableBeds}</div>
+                                            <small class="text-muted">Available</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="mb-2">
+                                            <small class="text-muted">Bed Occupancy</small>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar ${occupancyRate > 80 ? 'bg-danger' : occupancyRate > 60 ? 'bg-warning' : 'bg-success'}"
+                                                     style="width: ${occupancyRate}%"></div>
+                                            </div>
+                                            <small class="text-muted">${occupancyRate}% occupied</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-user-md me-1"></i>
+                                                ${hospital.doctors ? hospital.doctors.length : 0} Doctors
+                                            </small>
+                                            <small class="text-muted">
+                                                <i class="fas fa-sitemap me-1"></i>
+                                                ${hospital.departments ? hospital.departments.length : 0} Departments
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-outline-primary btn-sm me-2" onclick="viewHospitalDetails('${hospital._id}')">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </button>
+                                <button class="btn btn-outline-success btn-sm me-2" onclick="manageDepartments('${hospital._id}')">
+                                    <i class="fas fa-cogs me-1"></i>Manage
+                                </button>
+                                <button class="btn btn-outline-warning btn-sm" onclick="showCreateHospitalLoginModal('${hospital._id}','${hospital.name.replace(/'/g,'')}')">
+                                    <i class="fas fa-key me-1"></i>Login
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function showAddHospitalModal() {
+            const modalHtml = `
+                <div class="modal fade" id="addHospitalModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add New Hospital</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addHospitalForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Hospital Name *</label>
+                                            <input type="text" class="form-control" id="hospitalName" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="hospitalEmail">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Phone</label>
+                                            <input type="tel" class="form-control" id="hospitalPhone">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Website</label>
+                                            <input type="url" class="form-control" id="hospitalWebsite">
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label">Address *</label>
+                                            <textarea class="form-control" id="hospitalAddress" rows="3" required></textarea>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Total Beds</label>
+                                            <input type="number" class="form-control" id="totalBeds" min="0">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Available Beds</label>
+                                            <input type="number" class="form-control" id="availableBeds" min="0">
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label">Description</label>
+                                            <textarea class="form-control" id="hospitalDescription" rows="2"></textarea>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" onclick="addHospital()">Add Hospital</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('addHospitalModal'));
+            modal.show();
+
+            // Clean up modal after hiding
+            document.getElementById('addHospitalModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        async function addHospital() {
+            const name = document.getElementById("hospitalName").value.trim();
+            const address = document.getElementById("hospitalAddress").value.trim();
+
+            if (!name || !address) {
+                alert("Hospital name and address are required!");
+                return;
+            }
+
+            const hospitalData = {
+                name: name,
+                address: address,
+                email: document.getElementById("hospitalEmail").value.trim(),
+                phone: document.getElementById("hospitalPhone").value.trim(),
+                website: document.getElementById("hospitalWebsite").value.trim(),
+                totalBeds: parseInt(document.getElementById("totalBeds").value) || 0,
+                availableBeds: parseInt(document.getElementById("availableBeds").value) || 0,
+                description: document.getElementById("hospitalDescription").value.trim(),
+                departments: []
+            };
+
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const response = await fetch("http://localhost:5000/api/hospital", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user.token}`
+                    },
+                    body: JSON.stringify(hospitalData)
+                });
+
+                const result = await response.json();
+                console.log("Add hospital response:", result);
+
+                if (response.ok && result.success) {
+                    alert("Hospital added successfully!");
+                    bootstrap.Modal.getInstance(document.getElementById('addHospitalModal')).hide();
+                    loadHospitals();
+                } else {
+                    alert("Error adding hospital: " + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Network error. Please try again.");
+            }
+        }
+
+        async function editHospital(hospitalId) {
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}`, {
+                    headers: { "Authorization": `Bearer ${user.token}` }
+                });
+                const json = await response.json();
+                if (!response.ok) { alert("Error loading hospital details"); return; }
+                // Unwrap: { success, message, data: { hospital: {...} } }
+                const hospital = json.data?.hospital || json;
+                showEditHospitalModal(hospital);
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Network error. Please try again.");
+            }
+        }
+
+        function showEditHospitalModal(hospital) {
+            const modalHtml = `
+                <div class="modal fade" id="editHospitalModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Hospital</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editHospitalForm">
+                                    <input type="hidden" id="editHospitalId" value="${hospital._id}">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Hospital Name *</label>
+                                            <input type="text" class="form-control" id="editHospitalName" value="${hospital.name}" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="editHospitalEmail" value="${hospital.email || ''}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Phone</label>
+                                            <input type="tel" class="form-control" id="editHospitalPhone" value="${hospital.phone || ''}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Website</label>
+                                            <input type="url" class="form-control" id="editHospitalWebsite" value="${hospital.website || ''}">
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label">Address *</label>
+                                            <textarea class="form-control" id="editHospitalAddress" rows="3" required>${hospital.address || ''}</textarea>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Total Beds</label>
+                                            <input type="number" class="form-control" id="editTotalBeds" value="${hospital.totalBeds || 0}" min="0">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Available Beds</label>
+                                            <input type="number" class="form-control" id="editAvailableBeds" value="${hospital.availableBeds || 0}" min="0">
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label class="form-label">Description</label>
+                                            <textarea class="form-control" id="editHospitalDescription" rows="2">${hospital.description || ''}</textarea>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" onclick="updateHospital()">Update Hospital</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('editHospitalModal'));
+            modal.show();
+
+            document.getElementById('editHospitalModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        async function updateHospital() {
+            const hospitalId = document.getElementById("editHospitalId").value;
+            const name = document.getElementById("editHospitalName").value.trim();
+            const address = document.getElementById("editHospitalAddress").value.trim();
+
+            if (!name || !address) {
+                alert("Hospital name and address are required!");
+                return;
+            }
+
+            const hospitalData = {
+                name: name,
+                address: address,
+                email: document.getElementById("editHospitalEmail").value.trim(),
+                phone: document.getElementById("editHospitalPhone").value.trim(),
+                website: document.getElementById("editHospitalWebsite").value.trim(),
+                totalBeds: parseInt(document.getElementById("editTotalBeds").value) || 0,
+                availableBeds: parseInt(document.getElementById("editAvailableBeds").value) || 0,
+                description: document.getElementById("editHospitalDescription").value.trim()
+            };
+
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user.token}`
+                    },
+                    body: JSON.stringify(hospitalData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert("Hospital updated successfully!");
+                    bootstrap.Modal.getInstance(document.getElementById('editHospitalModal')).hide();
+                    loadHospitals();
+                } else {
+                    alert("Error updating hospital: " + (result.message || result.error));
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Network error. Please try again.");
+            }
+        }
+
+        async function deleteHospital(hospitalId) {
+            if (!confirm("Are you sure you want to delete this hospital? This action cannot be undone.")) {
+                return;
+            }
+
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${user.token}`
+                    }
+                });
+
+                if (response.ok) {
+                    alert("Hospital deleted successfully!");
+                    loadHospitals();
+                } else {
+                    const result = await response.json();
+                    alert("Error deleting hospital: " + (result.message || result.error));
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Network error. Please try again.");
+            }
+        }
+
+        async function viewHospitalDetails(hospitalId) {
+            const user = JSON.parse(localStorage.getItem("user"));
+            try {
+                const res = await fetch(`http://localhost:5000/api/hospital/${hospitalId}`, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const json = await res.json();
+                if (!res.ok) { alert(json.message || 'Error loading hospital'); return; }
+
+                // Response: { success, message, data: { hospital: {...} } }
+                const h = json.data?.hospital || json.hospital || json;
+                const depts = (h.departments || []).map(d =>
+                    `<li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            <span><i class="fas fa-stethoscope me-2 text-primary"></i>${d.name}</span>
+                            <small class="text-muted d-block">
+                                <i class="fas fa-user-md me-1"></i>${d.doctorCount || 0} doctors
+                                <span class="mx-2">|</span>
+                                <i class="fas fa-bed me-1"></i>${d.bedCount || h.availableBeds || 0} beds
+                            </small>
+                        </div>
+                        <small class="text-muted">${d.head ? 'Head: ' + d.head : ''}</small>
+                    </li>`
+                ).join('') || '<li class="list-group-item text-muted">No departments</li>';
+
+                const doctors = (h.doctors || []).map(d =>
+                    `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>${d.name || 'Unknown'}</span>
+                        <span class="badge bg-info">${d.specialization || ''}</span>
+                    </li>`
+                ).join('') || '<li class="list-group-item text-muted">No doctors assigned</li>';
+
+                const occupied = (h.totalBeds || 0) - (h.availableBeds || 0);
+                const pct = h.totalBeds > 0 ? Math.round((occupied / h.totalBeds) * 100) : 0;
+
+                const modalHtml = `
+                    <div class="modal fade" id="hospitalDetailModal" tabindex="-1">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title"><i class="fas fa-hospital me-2"></i>${h.name}</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row g-3">
+                                        <!-- Info -->
+                                        <div class="col-md-6">
+                                            <div class="card h-100">
+                                                <div class="card-header"><h6 class="mb-0">Hospital Information</h6></div>
+                                                <div class="card-body">
+                                                    <p><i class="fas fa-map-marker-alt text-danger me-2"></i><strong>Location:</strong> ${h.address || 'N/A'}</p>
+                                                    <p><i class="fas fa-phone text-success me-2"></i><strong>Phone:</strong> ${h.phone || 'N/A'}</p>
+                                                    <p><i class="fas fa-envelope text-primary me-2"></i><strong>Email:</strong> ${h.email || 'N/A'}</p>
+                                                    <p><i class="fas fa-globe text-info me-2"></i><strong>Website:</strong> ${h.website ? '<a href="'+h.website+'" target="_blank">'+h.website+'</a>' : 'N/A'}</p>
+                                                    <p class="mb-0"><i class="fas fa-info-circle text-muted me-2"></i>${h.description || 'No description'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Bed stats -->
+                                        <div class="col-md-6">
+                                            <div class="card h-100">
+                                                <div class="card-header"><h6 class="mb-0">Bed Statistics</h6></div>
+                                                <div class="card-body">
+                                                    <div class="row text-center g-3 mb-3">
+                                                        <div class="col-4">
+                                                            <div class="h3 text-primary mb-0">${h.totalBeds || 0}</div>
+                                                            <small class="text-muted">Total</small>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="h3 text-success mb-0">${h.availableBeds || 0}</div>
+                                                            <small class="text-muted">Available</small>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="h3 text-warning mb-0">${occupied}</div>
+                                                            <small class="text-muted">Occupied</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-1 d-flex justify-content-between">
+                                                        <small>Occupancy</small><small>${pct}%</small>
+                                                    </div>
+                                                    <div class="progress" style="height:10px;">
+                                                        <div class="progress-bar bg-${pct>80?'danger':pct>60?'warning':'success'}" style="width:${pct}%"></div>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="d-flex justify-content-between">
+                                                        <span><i class="fas fa-user-md me-1 text-info"></i>Doctors assigned</span>
+                                                        <strong>${(h.doctors || []).length}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between mt-1">
+                                                        <span><i class="fas fa-sitemap me-1 text-primary"></i>Departments</span>
+                                                        <strong>${(h.departments || []).length}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Departments -->
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-header d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0">Departments</h6>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="manageDepartments('${h._id}')">Manage</button>
+                                                </div>
+                                                <ul class="list-group list-group-flush" style="max-height:220px;overflow-y:auto;">${depts}</ul>
+                                            </div>
+                                        </div>
+                                        <!-- Doctors -->
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-header d-flex justify-content-between align-items-center">
+                                                    <h6 class="mb-0">Assigned Doctors</h6>
+                                                    <button class="btn btn-sm btn-outline-success" onclick="openAssignDoctorModal('${h._id}')">Assign Doctor</button>
+                                                </div>
+                                                <ul class="list-group list-group-flush" style="max-height:220px;overflow-y:auto;">${doctors}</ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="editHospital('${h._id}')">
+                                        <i class="fas fa-edit me-1"></i>Edit Hospital
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                const modal = new bootstrap.Modal(document.getElementById('hospitalDetailModal'));
+                modal.show();
+                document.getElementById('hospitalDetailModal').addEventListener('hidden.bs.modal', function() { this.remove(); });
+            } catch (err) {
+                console.error("viewHospitalDetails error:", err);
+                alert('Network error loading hospital details');
+            }
+        }
+
+        function manageDepartments(hospitalId) {
+            showDepartmentManagement(hospitalId);
+        }
+
+        async function openAssignDoctorModal(hospitalId) {
+            const user = JSON.parse(localStorage.getItem("user"));
+            try {
+                const res = await fetch("http://localhost:5000/api/admin/doctors", {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const json = await res.json();
+                const doctors = json.data?.doctors || [];
+
+                const options = doctors.map(d =>
+                    `<option value="${d._id}">${d.name} — ${d.specialization}</option>`
+                ).join('');
+
+                const modalHtml = `
+                    <div class="modal fade" id="assignDoctorModal" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Assign Doctor to Hospital</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" id="assignHospitalId" value="${hospitalId}">
+                                    <div class="mb-3">
+                                        <label class="form-label">Select Doctor *</label>
+                                        <select class="form-select" id="assignDoctorSelect">
+                                            <option value="">Choose a doctor</option>
+                                            ${options}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-success" onclick="doAssignDoctor()">Assign</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                const modal = new bootstrap.Modal(document.getElementById('assignDoctorModal'));
+                modal.show();
+                document.getElementById('assignDoctorModal').addEventListener('hidden.bs.modal', function() { this.remove(); });
+            } catch (err) {
+                console.error(err);
+                alert('Error loading doctors');
+            }
+        }
+
+        async function doAssignDoctor() {
+            const admin      = JSON.parse(localStorage.getItem("user"));
+            const hospitalId = document.getElementById("assignHospitalId").value;
+            const doctorId   = document.getElementById("assignDoctorSelect").value;
+            if (!doctorId) { alert("Please select a doctor"); return; }
+            try {
+                const res = await fetch(`http://localhost:5000/api/admin/hospitals/${hospitalId}/assign-doctor`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admin.token}` },
+                    body: JSON.stringify({ doctorId })
+                });
+                const json = await res.json();
+                if (res.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('assignDoctorModal')).hide();
+                    alert('Doctor assigned successfully!');
+                    loadHospitals();
+                } else {
+                    alert(json.message || 'Failed to assign doctor');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network error');
+            }
+        }
+
+        function showCreateHospitalLoginModal(hospitalId, hospitalName) {
+            const modalHtml = `
+                <div class="modal fade" id="hospitalLoginModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-success text-white">
+                                <h5 class="modal-title"><i class="fas fa-key me-2"></i>Create Hospital Login</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-muted small">Create login credentials for <strong>${hospitalName}</strong>. The hospital can then log in via the login page.</p>
+                                <input type="hidden" id="hospLoginHospitalId" value="${hospitalId}">
+                                <div class="mb-3">
+                                    <label class="form-label">Login Email *</label>
+                                    <input type="email" class="form-control" id="hospLoginEmail" placeholder="hospital@example.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password *</label>
+                                    <input type="password" class="form-control" id="hospLoginPassword" placeholder="Min 8 characters">
+                                </div>
+                                <div id="hospLoginResult"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-success" onclick="doCreateHospitalLogin()">Create Login</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('hospitalLoginModal'));
+            modal.show();
+            document.getElementById('hospitalLoginModal').addEventListener('hidden.bs.modal', function() { this.remove(); });
+        }
+
+        async function doCreateHospitalLogin() {
+            const admin      = JSON.parse(localStorage.getItem("user"));
+            const hospitalId = document.getElementById("hospLoginHospitalId").value;
+            const email      = document.getElementById("hospLoginEmail").value.trim();
+            const password   = document.getElementById("hospLoginPassword").value;
+            const resultDiv  = document.getElementById("hospLoginResult");
+
+            if (!email || !password) { alert("Email and password are required"); return; }
+
+            try {
+                const res = await fetch("http://localhost:5000/api/admin/create-hospital-login", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${admin.token}` },
+                    body: JSON.stringify({ hospitalId, email, password })
+                });
+                const json = await res.json();
+                if (res.ok) {
+                    resultDiv.innerHTML = `<div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>Login created!<br>
+                        <strong>Email:</strong> ${json.data.loginEmail}<br>
+                        <small>Hospital can now log in via the login page.</small>
+                    </div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">${json.message || 'Failed to create login'}</div>`;
+                }
+            } catch (err) {
+                console.error(err);
+                resultDiv.innerHTML = `<div class="alert alert-danger">Network error</div>`;
+            }
+        }
+
+        function showDepartmentManagement(hospitalId) {
+            const container = document.getElementById("mainContent");
+
+            container.innerHTML = `
+                <div class="section-header">
+                    <h2><i class="fas fa-sitemap me-2"></i>Department Management</h2>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-secondary" onclick="showHospitalManagement()">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Hospitals
+                        </button>
+                        <button class="btn btn-success" onclick="showAddDepartmentModal('${hospitalId}')">
+                            <i class="fas fa-plus me-1"></i>Add Department
+                        </button>
+                    </div>
+                </div>
+
+                <div id="departmentsList" class="row">
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading departments...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            loadDepartments(hospitalId);
+        }
+
+        async function loadDepartments(hospitalId) {
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}`, {
+                    headers: { "Authorization": `Bearer ${user.token}` }
+                });
+                const json = await response.json();
+                if (response.ok) {
+                    // Unwrap: { success, message, data: { hospital: {...} } }
+                    const hospital = json.data?.hospital || json;
+                    displayDepartments(hospital, hospitalId);
+                } else {
+                    document.getElementById("departmentsList").innerHTML = `
+                        <div class="col-12"><div class="alert alert-danger">Error loading departments.</div></div>`;
+                }
+            } catch (error) {
+                console.error("Error loading departments:", error);
+                document.getElementById("departmentsList").innerHTML = `
+                    <div class="col-12"><div class="alert alert-danger">Error loading departments.</div></div>`;
+            }
+        }
+
+        function displayDepartments(hospital, hospitalId) {
+            const container = document.getElementById("departmentsList");
+            const departments = hospital.departments || [];
+
+            if (departments.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-sitemap fa-3x text-muted mb-3"></i>
+                            <h4>No Departments Found</h4>
+                            <p class="text-muted">Start by adding departments to this hospital</p>
+                            <button class="btn btn-primary" onclick="showAddDepartmentModal('${hospitalId}')">
+                                <i class="fas fa-plus me-1"></i>Add First Department
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = "";
+            departments.forEach((dept, index) => {
+                const statusBadge = dept.status === 'active' ? 'bg-success' : 'bg-secondary';
+                const statusText = dept.status === 'active' ? 'Active' : 'Inactive';
+
+                html += `
+                    <div class="col-lg-6 col-xl-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">${dept.name}</h5>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#" onclick="editDepartment('${hospitalId}', ${index})">
+                                            <i class="fas fa-edit me-2"></i>Edit
+                                        </a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="deleteDepartment('${hospitalId}', ${index})">
+                                            <i class="fas fa-trash me-2"></i>Delete
+                                        </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <div class="h4 mb-0 text-primary">${dept.doctorsCount || 0}</div>
+                                            <small class="text-muted">Doctors</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <div class="h4 mb-0 text-info">${dept.bedsCount || 0}</div>
+                                            <small class="text-muted">Beds</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-center">
+                                            <span class="badge ${statusBadge}">${statusText}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function showAddDepartmentModal(hospitalId) {
+            const modalHtml = `
+                <div class="modal fade" id="addDepartmentModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Add Department</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="addDepartmentForm">
+                                    <input type="hidden" id="deptHospitalId" value="${hospitalId}">
+                                    <div class="mb-3">
+                                        <label class="form-label">Department Name *</label>
+                                        <input type="text" class="form-control" id="departmentName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Number of Doctors</label>
+                                        <input type="number" class="form-control" id="doctorsCount" min="0" value="0">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Number of Beds</label>
+                                        <input type="number" class="form-control" id="bedsCount" min="0" value="0">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <select class="form-control" id="departmentStatus">
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" onclick="addDepartment()">Add Department</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('addDepartmentModal'));
+            modal.show();
+
+            document.getElementById('addDepartmentModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        async function addDepartment() {
+            const hospitalId = document.getElementById("deptHospitalId").value;
+            const name = document.getElementById("departmentName").value.trim();
+
+            if (!name) {
+                alert("Department name is required!");
+                return;
+            }
+
+            const departmentData = {
+                name: name,
+                doctorsCount: parseInt(document.getElementById("doctorsCount").value) || 0,
+                bedsCount: parseInt(document.getElementById("bedsCount").value) || 0,
+                status: document.getElementById("departmentStatus").value
+            };
+
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}/departments`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${user.token}`
+                    },
+                    body: JSON.stringify(departmentData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert("Department added successfully!");
+                    bootstrap.Modal.getInstance(document.getElementById('addDepartmentModal')).hide();
+                    loadDepartments(hospitalId);
+                } else {
+                    alert("Error adding department: " + (result.message || result.error));
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Network error. Please try again.");
+            }
+        }
+
+        async function deleteDepartment(hospitalId, deptIndex) {
+            if (!confirm("Are you sure you want to delete this department?")) {
+                return;
+            }
+
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const response = await fetch(`http://localhost:5000/api/hospital/${hospitalId}/departments/${deptIndex}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${user.token}`
+                    }
+                });
+
+                if (response.ok) {
+                    alert("Department deleted successfully!");
+                    loadDepartments(hospitalId);
+                } else {
+                    const result = await response.json();
+                    alert("Error deleting department: " + (result.message || result.error));
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Network error. Please try again.");
+            }
+        }
+
+        async function loadDoctorsForLogin() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            const select = document.getElementById("doctorSelect");
+            select.innerHTML = '<option value="">Loading doctors...</option>';
+            try {
+                const response = await fetch("http://localhost:5000/api/admin/doctors", {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
+                const json = await response.json();
+                // Response: { success, message, data: { doctors: [...] } }
+                const doctors = json.data?.doctors || [];
+                if (!doctors.length) {
+                    select.innerHTML = '<option value="">No doctors available</option>';
+                    return;
+                }
+                select.innerHTML = '<option value="">Select a doctor</option>';
+                doctors.forEach(doc => {
+                    const email = doc.user?.email || '';
+                    select.innerHTML += `<option value="${doc._id}">${doc.name} — ${doc.specialization} (${email})</option>`;
+                });
+            } catch (err) {
+                console.error("Error loading doctors for login:", err);
+                select.innerHTML = '<option value="">Error loading doctors</option>';
+            }
+        }
+
+        function openDoctorLoginModal(){
+
+            // Load doctors for dropdown
+            loadDoctorsForLogin();
+            const modal =
+            new bootstrap.Modal(
+            document.getElementById("doctorLoginModal")
+            );
+            modal.show();
+            }
+            async function loginDoctorFromAdmin(){
+            const doctorId = document.getElementById("doctorSelect").value;
+            const password = document.getElementById("doctorPassword").value;
+            const admin    = JSON.parse(localStorage.getItem("user"));
+
+            if (!admin) { alert("Admin session expired"); return; }
+            if (!password) { alert("Please enter the doctor's password"); return; }
+
+            // Allow login via dropdown selection OR direct email entry
+            const emailInput = document.getElementById("doctorEmailLogin");
+            const email = emailInput ? emailInput.value.trim() : '';
+
+            if (!doctorId && !email) {
+                alert("Please select a doctor from the dropdown or enter their email");
+                return;
+            }
+
+            try {
+                const body = { password };
+                if (doctorId) body.doctorId = doctorId;
+                if (email)    body.email    = email;
+
+                const res = await fetch(
+                    "http://localhost:5000/api/auth/admin/doctor-login",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${admin.token}`
+                        },
+                        body: JSON.stringify(body)
+                    }
+                );
+                const json = await res.json();
+                console.log("Doctor login response:", json);
+
+                if (res.ok && json.success) {
+                    const { token, user } = json.data;
+                    localStorage.setItem("user", JSON.stringify({ ...user, token }));
+                    window.location = "doctor.html";
+                } else {
+                    alert(json.message || "Doctor login failed");
+                }
+            } catch(err) {
+                console.error("Doctor login error:", err);
+                alert("Server error during doctor login");
+            }
+        }
+    </script>
+    <div class="modal fade" id="doctorLoginModal" tabindex="-1">
+        <div class="modal-dialog">
+        <div class="modal-content">
+
+        <div class="modal-header">
+        <h5 class="modal-title">Doctor Login</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+
+        <div class="mb-3">
+        <label>Doctor</label>
+        <select id="doctorSelect" class="form-control">
+            <option value="">Loading doctors...</option>
+        </select>
+        </div>
+
+        <div class="text-center text-muted my-2"><small>— or enter email directly —</small></div>
+
+        <div class="mb-3">
+        <label>Doctor Email <small class="text-muted">(optional if selected above)</small></label>
+        <input type="email" id="doctorEmailLogin" class="form-control" placeholder="doctor@hospital.com">
+        </div>
+
+        <div class="mb-3">
+        <label>Password</label>
+        <input type="password"
+        id="doctorPassword"
+        class="form-control"
+        placeholder="Enter doctor password">
+        </div>
+
+        <button class="btn btn-primary w-100"
+        onclick="loginDoctorFromAdmin()">
+        Login to Dashboard
+        </button>
+        </div>
+        </div>
+        </div>
+        </div>
+</body>
+</html>
